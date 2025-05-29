@@ -1,0 +1,23 @@
+{
+  "name": "mono-modular-crm",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "backend:dev": "turbo run dev --filter=backend",
+    "backend:build": "turbo run build --filter=backend"
+  },
+  "devDependencies": {
+    "turbo": "latest",
+    "prettier": "^3.2.5"
+  },
+  "packageManager": "pnpm@10.8.0"
+}
