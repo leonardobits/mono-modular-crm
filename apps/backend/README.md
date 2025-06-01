@@ -1,88 +1,98 @@
-# CRM Backend
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
-This is the backend service for the CRM application, built with NestJS and TypeORM.
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-## Features
+  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+</p>
+  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-- Authentication with JWT
-- Multitenancy support
-- User management
-- Conversation management
-- WhatsApp integration via Evolution API
-- WebSocket support for real-time updates
+## Description
 
-## Prerequisites
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-- Node.js 18+
-- PostgreSQL 14+
-- pnpm
+## Project setup
 
-## Setup
-
-1. Create a PostgreSQL database:
-```sql
-CREATE DATABASE crm;
-```
-
-2. Create a `.env` file in the root directory with the following content:
-```env
-NODE_ENV=development
-PORT=3000
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/crm
-JWT_SECRET=your-super-secret-key-change-in-production
-JWT_EXPIRES_IN=1d
-EVOLUTION_API_URL=http://localhost:8080
-EVOLUTION_API_KEY=your-api-key
-```
-
-3. Install dependencies:
 ```bash
-pnpm install
+$ pnpm install
 ```
 
-4. Start the development server:
+## Compile and run the project
+
 ```bash
-pnpm start:dev
+# development
+$ pnpm run start
+
+# watch mode
+$ pnpm run start:dev
+
+# production mode
+$ pnpm run start:prod
 ```
 
-## API Endpoints
+## Run tests
 
-### Authentication
-- POST `/auth/login` - Login with email and password
+```bash
+# unit tests
+$ pnpm run test
 
-### Users
-- GET `/users` - Get all users
-- GET `/users/:id` - Get user by ID
-- POST `/users` - Create new user
-- PATCH `/users/:id` - Update user
-- DELETE `/users/:id` - Delete user
+# e2e tests
+$ pnpm run test:e2e
 
-### Tenants
-- GET `/tenants` - Get all tenants
-- GET `/tenants/:id` - Get tenant by ID
-- POST `/tenants` - Create new tenant
-- PATCH `/tenants/:id` - Update tenant
-- DELETE `/tenants/:id` - Delete tenant
+# test coverage
+$ pnpm run test:cov
+```
 
-### Inboxes
-- GET `/inboxes` - Get all inboxes
-- GET `/inboxes/:id` - Get inbox by ID
-- POST `/inboxes` - Create new inbox
-- PATCH `/inboxes/:id` - Update inbox
-- DELETE `/inboxes/:id` - Delete inbox
+## Deployment
 
-### Conversations
-- GET `/conversations` - Get all conversations
-- GET `/conversations/:id` - Get conversation by ID
-- POST `/conversations` - Create new conversation
-- PATCH `/conversations/:id` - Update conversation
-- DELETE `/conversations/:id` - Delete conversation
+When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
 
-## WebSocket Events
+If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
 
-The application uses WebSocket for real-time updates. Connect to `ws://localhost:3000` to receive events.
+```bash
+$ pnpm install -g @nestjs/mau
+$ mau deploy
+```
 
-### Events
-- `message:new` - New message received
-- `conversation:status` - Conversation status update
-- `whatsapp:status` - WhatsApp connection status update 
+With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+
+## Resources
+
+Check out a few resources that may come in handy when working with NestJS:
+
+- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
+- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
+- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
+- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
+- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
+- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
+- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
+- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+
+## Support
+
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+
+## Stay in touch
+
+- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
+
+## License
+
+Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
