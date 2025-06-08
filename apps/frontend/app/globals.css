@@ -91,6 +91,10 @@
   --sidebar-accent-foreground: oklch(0.5 0.28 265);
   --sidebar-border: oklch(0.9 0.01 240);
   --sidebar-ring: oklch(0.6 0.3 290);
+
+  /* Aurora Background Colors */
+  --aurora-primary: oklch(0.8 0.1 265); /* Soft light purple */
+  --aurora-secondary: oklch(0.9 0.08 300); /* Soft light pink */
 }
 
 .dark {
@@ -140,6 +144,10 @@
   --sidebar-accent-foreground: oklch(0.8 0.28 310);
   --sidebar-border: oklch(0.2 0.03 245);
   --sidebar-ring: oklch(0.7 0.35 295);
+
+  /* Aurora Background Colors */
+  --aurora-primary: oklch(0.65 0.28 255); /* Stylish Blue */
+  --aurora-secondary: oklch(0.7 0.32 285); /* Vibrant Purple */
 }
 
 @layer base {
@@ -154,4 +162,45 @@
     background-image: radial-gradient(at 27% 37%, oklch(0.6 0.32 270 / 0.2) 0px, transparent 50%), 
                       radial-gradient(at 73% 67%, oklch(0.8 0.28 310 / 0.1) 0px, transparent 50%);
   }
+}
+
+/* Custom Scrollbar Styles */
+html {
+  scrollbar-color: var(--accent-foreground) var(--muted);
+  scrollbar-width: thin;
+}
+
+/* For Webkit-based browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--muted);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--accent-foreground);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary);
+}
+
+/* Always-dark scrollbar for the homepage */
+.home-dark-scrollbar::-webkit-scrollbar-track {
+  background-color: oklch(0.15 0.03 245); /* --muted dark */
+}
+
+.home-dark-scrollbar::-webkit-scrollbar-thumb {
+  background-color: oklch(0.7 0.32 285); /* --accent-foreground dark */
+}
+
+.home-dark-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: oklch(0.65 0.28 255); /* --primary dark */
 }

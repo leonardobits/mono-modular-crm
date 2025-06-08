@@ -45,25 +45,25 @@ export function HeroSection() {
           <h1 className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
             Atendimento Reinventado.
           </h1>
-          <p className="mt-2 text-2xl font-normal tracking-tight text-slate-300 md:text-4xl">
+          <p className="mt-2 text-2xl font-normal tracking-tight text-foreground/80 md:text-4xl">
             O CRM open-source que coloca você no controle.
           </p>
         </div>
-        <p className="max-w-xl text-center text-lg text-slate-400">
+        <p className="max-w-xl text-center text-lg text-muted-foreground">
           Cansado de plataformas rígidas? Molde nosso CRM modular às suas necessidades e seja dono da sua inovação.
         </p>
         <div className="flex items-center gap-4 py-4">
           <Button
             asChild
             size="lg"
-            className="group relative bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+            className="group relative bg-gradient-to-r from-blue-500 to-purple-500 text-primary-foreground"
           >
             <Link href="/register">
               <span className="absolute h-full w-full rounded-md bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100"></span>
               <span className="relative">Comece Agora</span>
             </Link>
           </Button>
-          <Button size="lg" className="border border-slate-400 bg-transparent text-slate-200 transition-colors hover:border-slate-200 hover:bg-white/10 hover:text-white">
+          <Button size="lg" variant="outline">
             Veja uma Demo
           </Button>
         </div>

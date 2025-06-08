@@ -4,12 +4,6 @@ import { cn } from "@/lib/utils";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import React from "react";
 
-// Define custom colors for the aurora effect
-const auroraColors = {
-  primary: "oklch(0.65 0.28 255)", // Stylish Blue
-  secondary: "oklch(0.7 0.32 285)", // Vibrant Purple
-};
-
 export const AuroraBackground = ({
   className,
   children,
@@ -42,7 +36,7 @@ export const AuroraBackground = ({
   return (
     <div
       className={cn(
-        "relative flex h-full min-h-screen w-full flex-col bg-[#0D1117] text-slate-200",
+        "relative flex h-full min-h-screen w-full flex-col bg-background text-foreground transition-colors duration-300",
         className
       )}
       onMouseMove={handleMouseMove}
@@ -66,12 +60,6 @@ export const AuroraBackground = ({
             opacity-50
             will-change-transform`
           )}
-          style={
-            {
-              "--aurora-primary": auroraColors.primary,
-              "--aurora-secondary": auroraColors.secondary,
-            } as React.CSSProperties
-          }
         />
       </div>
       {showRadialGradient && (
@@ -82,7 +70,7 @@ export const AuroraBackground = ({
               "--x": x,
               "--y": y,
               background:
-                "radial-gradient(var(--size) circle at var(--x) var(--y), oklch(0.7 0.32 285 / 0.2), transparent 100%)",
+                "radial-gradient(var(--size) circle at var(--x) var(--y), var(--aurora-secondary), transparent 100%)",
             } as React.CSSProperties
           }
         />

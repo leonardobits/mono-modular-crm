@@ -33,13 +33,13 @@ export function TechStackSection() {
     <section className="py-24">
       <div className="container mx-auto max-w-7xl">
         <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold text-slate-200 md:text-5xl">
+          <h2 className="text-3xl font-bold text-foreground md:text-5xl">
             Construído com as{" "}
             <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
               Melhores Ferramentas
             </span>
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-400">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Utilizamos uma stack moderna e poderosa para garantir performance, escalabilidade e uma experiência de desenvolvimento de ponta.
           </p>
         </div>
@@ -49,10 +49,10 @@ export function TechStackSection() {
           <div className="flex w-max animate-scroll">
             {[...technologies, ...technologies].map((tech, index) => (
               <div key={index} className="mx-8 flex flex-col items-center justify-center gap-2 text-center">
-                <div className="text-slate-400 transition-all duration-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+                <div className="text-muted-foreground transition-all duration-300 hover:text-primary hover:drop-shadow-[0_0_8px_var(--primary)]">
                   {tech.icon}
                 </div>
-                <span className="text-sm text-slate-500">{tech.name}</span>
+                <span className="text-sm text-muted-foreground">{tech.name}</span>
               </div>
             ))}
           </div>

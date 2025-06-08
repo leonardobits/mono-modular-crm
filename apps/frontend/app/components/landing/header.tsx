@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { motion, useAnimation, useMotionValueEvent, useScroll } from "framer-motion";
 import Link from "next/link";
 
@@ -26,7 +27,7 @@ export function Header() {
       initial="visible"
       animate={controls}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed inset-x-0 top-0 z-50 h-20 border-b border-white/[0.1] bg-[#0D1117]/80 backdrop-blur-lg"
+      className="fixed inset-x-0 top-0 z-50 h-20 border-border bg-background/80 backdrop-blur-lg"
     >
       <div className="container mx-auto flex h-full max-w-7xl items-center justify-between px-4">
         <div className="text-xl font-bold">
@@ -35,18 +36,19 @@ export function Header() {
           </Link>
         </div>
         <nav className="hidden items-center gap-6 md:flex">
-          <Link href="#features" className="text-slate-400 transition-colors hover:text-slate-200">
+          <Link href="#features" className="text-muted-foreground transition-colors hover:text-foreground">
             Recursos
           </Link>
-          <Link href="#docs" className="text-slate-400 transition-colors hover:text-slate-200">
+          <Link href="#docs" className="text-muted-foreground transition-colors hover:text-foreground">
             Documentação
           </Link>
         </nav>
-        <div className="flex items-center gap-4">
-          <Button asChild variant="ghost" className="text-slate-200 hover:bg-white/10 hover:text-white">
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button asChild variant="ghost">
             <Link href="/login">Login</Link>
           </Button>
-          <Button asChild className="group relative bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+          <Button asChild className="group relative bg-gradient-to-r from-blue-500 to-purple-500 text-primary-foreground">
             <Link href="/register">
               <span className="absolute h-full w-full rounded-md bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100"></span>
               <span className="relative">Registrar-se</span>
