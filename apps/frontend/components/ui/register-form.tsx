@@ -3,6 +3,8 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { CreditCard } from "lucide-react";
+import { PatternFormat } from 'react-number-format';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -11,11 +13,13 @@ import { useState } from "react"
 import { cn } from "@/lib/utils" 
 import { User, Mail, Lock, Loader2 } from "lucide-react" 
 import {
-Form,
-FormControl,
-FormField,
-FormItem,
-FormMessage,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form"
 import { toast } from "sonner" 
 
@@ -23,8 +27,9 @@ import { toast } from "sonner"
 const formSchema = z.object({
 name: z.string().min(2, "O nome precisa ter pelo menos 2 caracteres."),
 email: z.string().email("E-mail inválido."),
+tipoPessoa: z.string().min(1, "Selecione o tipo de pessoa."),
 dataNascimento: z.string().min(10, "A data de nascimento precisa ter pelo menos 6 caracteres."),
-cpf: z.string().min(11, "O CPF precisa ter pelo menos 11 caracteres."),
+cpfCnpj: z.string().min(11, "O CPF/CNPJ precisa ter pelo menos 11 caracteres."),
 cep: z.string().min(8, "O CEP precisa ter pelo menos 8 caracteres."),
 Cidade: z.string().min(11, "A cidade precisa ter pelo menos 11 caracteres."),
 Estado: z.string().min(11, "O estado precisa ter pelo menos 11 caracteres."),
@@ -58,8 +63,9 @@ mode: "onSubmit",
 defaultValues: {
 name: "",
 email: "",
+tipoPessoa: "F",
 dataNascimento: "",
-cpf: "",
+cpfCnpj: "",
 cep: "",
 Cidade: "",
 Estado: "",
@@ -72,7 +78,8 @@ confirmPassword: "",
 });
 
 const [cepLoading, setCepLoading] = useState(false);
-const { setValue, getValues } = form; 
+const { setValue, getValues, watch, trigger } = form; 
+const tipoPessoa = watch('tipoPessoa'); 
 
 const handleCepBlur = async (cepValue: string) => {
 const cep = cepValue?.replace(/\D/g, ''); 
@@ -241,27 +248,56 @@ render={({ field, fieldState }) => (
 </div>
 
 <div className="space-y-2.5">
-<RequiredLabel htmlFor="cpf">CPF</RequiredLabel>
+<FormLabel className="block text-sm font-medium text-gray-700 mb-1">Tipo de Pessoa</FormLabel>
+<div className="flex space-x-2">
+<Button
+  type="button"
+  variant={tipoPessoa === 'F' ? 'default' : 'outline'}
+  onClick={() => {
+    form.setValue('tipoPessoa', 'F', { shouldValidate: true });
+    form.setValue('cpfCnpj', '', { shouldValidate: true });
+  }}
+  className="flex-1 h-12"
+>
+  Pessoa Física (CPF)
+</Button>
+<Button
+  type="button"
+  variant={tipoPessoa === 'J' ? 'default' : 'outline'}
+  onClick={() => {
+    form.setValue('tipoPessoa', 'J', { shouldValidate: true });
+    form.setValue('cpfCnpj', '', { shouldValidate: true });
+  }}
+  className="flex-1 h-12"
+>
+  Pessoa Jurídica (CNPJ)
+</Button>
+</div>
+</div>
+
+<div className="space-y-2.5">
+<RequiredLabel>{tipoPessoa === 'F' ? 'CPF' : 'CNPJ'}</RequiredLabel>
 <FormField
 control={form.control}
-name="cpf"
+name="cpfCnpj"
 render={({ field, fieldState }) => (
 <FormItem>
 <FormControl>
 <div className="relative">
 <div className="absolute left-3 top-3">
-  <Mail className="h-5 w-5 text-gray-500" />
+<CreditCard className="h-5 w-5" />
 </div>
-<Input
-  id="cpf"
-  type="cpf"
-  placeholder="000.000.000-00"
-  className={cn(
-    "h-12 pl-11",
-    fieldState.error && "border-red-500 focus-visible:ring-red-500"
-  )}
-  autoComplete="cpf"
-  {...field}
+<PatternFormat
+{...field}
+format={tipoPessoa === 'F' ? '###.###.###-##' : '##.###.###/####-##'}
+mask="_"
+customInput={Input}
+className={cn(
+"h-12 pl-11",
+fieldState.error && "border-red-500 focus-visible:ring-red-500"
+)}
+placeholder={tipoPessoa === 'F' ? 'Digite seu CPF' : 'Digite seu CNPJ'}
+onBlur={() => trigger('cpfCnpj')}
 />
 </div>
 </FormControl>
