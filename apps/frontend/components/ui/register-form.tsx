@@ -23,6 +23,7 @@ import { toast } from "sonner"
 const formSchema = z.object({
 name: z.string().min(2, "O nome precisa ter pelo menos 2 caracteres."),
 email: z.string().email("E-mail inválido."),
+dataNascimento: z.string().min(10, "A data de nascimento precisa ter pelo menos 6 caracteres."),
 cpf: z.string().min(11, "O CPF precisa ter pelo menos 11 caracteres."),
 cep: z.string().min(8, "O CEP precisa ter pelo menos 8 caracteres."),
 Cidade: z.string().min(11, "A cidade precisa ter pelo menos 11 caracteres."),
@@ -32,6 +33,7 @@ numero: z.string().min(11, "O número precisa ter pelo menos 11 caracteres."),
 complemento: z.string().min(11, "O complemento precisa ter pelo menos 11 caracteres."),
 password: z.string().min(6, "A senha precisa ter no mínimo 6 caracteres."),
 confirmPassword: z.string().min(6, "A confirmação de senha precisa ter no mínimo 6 caracteres."),
+
 });
 
 type RegisterFormData = z.infer<typeof formSchema>;
@@ -56,6 +58,7 @@ mode: "onSubmit",
 defaultValues: {
 name: "",
 email: "",
+dataNascimento: "",
 cpf: "",
 cep: "",
 Cidade: "",
@@ -207,6 +210,37 @@ render={({ field, fieldState }) => (
 </div>
 
 <div className="space-y-2.5">
+<RequiredLabel htmlFor="dataNascimento">Data de Nascimento</RequiredLabel>
+<FormField
+control={form.control}
+name="dataNascimento"
+render={({ field, fieldState }) => (
+<FormItem>
+<FormControl>
+<div className="relative">
+<div className="absolute left-3 top-3">
+  <Mail className="h-5 w-5 text-gray-500" />
+</div>
+<Input
+  id="dataNascimento"
+  type="date"
+  placeholder="dd/mm/yyyy"
+  className={cn(
+    "h-12 pl-11",
+    fieldState.error && "border-red-500 focus-visible:ring-red-500"
+  )}
+  autoComplete="data-birth"
+  {...field}
+/>
+</div>
+</FormControl>
+<FormMessage className="text-red-500" />
+</FormItem>
+)}
+/>
+</div>
+
+<div className="space-y-2.5">
 <RequiredLabel htmlFor="cpf">CPF</RequiredLabel>
 <FormField
 control={form.control}
@@ -260,7 +294,7 @@ render={({ field, fieldState }) => (
   autoComplete="postal-code"
   {...field}
   onBlur={() => {
-    field.onBlur(); // Chama o onBlur original do react-hook-form
+    field.onBlur(); 
     handleCepBlur(field.value);
   }}
   disabled={cepLoading}
