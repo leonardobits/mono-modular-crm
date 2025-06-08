@@ -16,8 +16,13 @@
     "backend:build": "turbo run build --filter=backend"
   },
   "devDependencies": {
-    "turbo": "latest",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "turbo": "latest"
   },
-  "packageManager": "pnpm@10.8.0"
+  "packageManager": "pnpm@10.11.1",
+  "dependencies": {
+    "@hookform/resolvers": "^5.1.0",
+    "react-hook-form": "^7.57.0",
+    "zod": "^3.25.46"
+  }
 }
