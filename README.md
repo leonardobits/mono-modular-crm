@@ -9,6 +9,11 @@ Antes de começar, certifique-se de ter instalado:
 - [Node.js](https://nodejs.org/) (v20.18.1 ou superior)
 - [PNPM](https://pnpm.io/) (v10.8.2 ou superior)
 
+> **Nota:** Se você ainda não tem o PNPM instalado, pode instalá-lo globalmente com:
+> ```bash
+> npm install -g pnpm@10.8.2
+> ```
+
 ## ⚠️ Aviso sobre Docker
 
 > **Atenção:** As configurações de Docker estão em desenvolvimento. Recomendamos usar o ambiente local para desenvolvimento até que a configuração esteja estável.
