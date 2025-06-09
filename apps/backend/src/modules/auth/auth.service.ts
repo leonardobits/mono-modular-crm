@@ -2,19 +2,21 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { SupabaseService } from '../../supabase/supabase.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { User } from '@supabase/supabase-js';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   async register(registerDto: RegisterDto) {
-    const { email, password } = registerDto;
-    const { data, error } = await this.supabaseService
-      .getClient()
-      .auth.signUp({
-        email,
-        password,
-      });
+    const supabase = this.supabaseService.getClient();
+    const { data, error } = await supabase.auth.signUp({
+      email: registerDto.email,
+      password: registerDto.password,
+      options: {
+        captchaToken: registerDto.captchaToken,
+      }
+    });
 
     if (error) {
       throw new BadRequestException(error.message);
@@ -41,5 +43,28 @@ export class AuthService {
     }
 
     return data;
+  }
+
+  async logout() {
+    const supabase = this.supabaseService.getClient();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      throw new UnauthorizedException(error.message);
+    }
+
+    return { message: 'Logout bem-sucedido.' };
+  }
+
+  getProfile(user: User) {
+    // O objeto 'user' já contém as informações do usuário logado.
+    // Você pode customizar o que é retornado aqui se necessário.
+    return user;
+  }
+
+  getSession(user: User) {
+    // A informação da "sessão" no contexto de um token JWT é o seu payload.
+    // O objeto 'user' representa esse payload.
+    return user;
   }
 } 

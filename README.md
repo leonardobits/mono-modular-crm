@@ -83,6 +83,14 @@ mono-modular-crm/
 └── package.json    # Configuração principal
 ```
 
+## 📖 Documentação
+
+A documentação da API do backend é gerada automaticamente usando Swagger e pode ser acessada enquanto o serviço do backend estiver em execução.
+
+-   **URL da Documentação:** [http://localhost:3001/api-docs](http://localhost:3001/api-docs)
+
+Para visualizar a documentação, inicie o backend com `pnpm backend:dev` e acesse o link acima no seu navegador.
+
 ## 🤝 Contribuindo
 
 1. Faça um Fork do projeto
