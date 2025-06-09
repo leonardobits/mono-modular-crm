@@ -9,6 +9,14 @@ Antes de começar, certifique-se de ter instalado:
 - [Node.js](https://nodejs.org/) (versão LTS recomendada)
 - [PNPM](https://pnpm.io/) (versão 10.8.0 ou superior)
 
+## ⚠️ Aviso sobre Docker
+
+> **Atenção:** As configurações de Docker deste projeto ainda estão em fase de desenvolvimento e ajustes. Isso significa que podem ocorrer erros ou comportamentos inesperados ao utilizar os containers neste momento.
+>
+> Estamos trabalhando para garantir uma experiência estável e padronizada em ambientes Docker, mas recomendamos, por enquanto, que utilize o ambiente local para desenvolvimento sempre que possível.
+>
+> Assim que a configuração estiver madura, este aviso será removido e a documentação será atualizada com instruções detalhadas para uso em produção e desenvolvimento via Docker.
+
 ## 🛠️ Instalação
 
 1. Clone o repositório:
@@ -22,17 +30,25 @@ cd mono-modular-crm
 pnpm install
 ```
 
+3. Compile os schemas Zod, que são essenciais para o projeto:
+```bash
+pnpm --filter zod-schemas build
+```
+
 ## 🚀 Como Executar
 
 ### Desenvolvimento
 
-Para iniciar o ambiente de desenvolvimento:
+Para iniciar o ambiente de desenvolvimento, usamos o Turborepo para gerenciar o monorepo. Você pode usar qualquer um dos comandos a seguir:
 
 ```bash
-# Inicia todos os serviços
+# Inicia todos os serviços em modo de desenvolvimento
 pnpm dev
 
-# Inicia apenas o backend
+# O comando acima é um atalho para:
+pnpm turbo dev
+
+# Para iniciar apenas o backend:
 pnpm backend:dev
 ```
 
