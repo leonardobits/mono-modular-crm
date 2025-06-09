@@ -70,9 +70,9 @@ services:
     volumes:
       - ./supabase/db_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=\${POSTGRES_USER}
-      - POSTGRES_PASSWORD=\${POSTGRES_PASSWORD}
-      - POSTGRES_DB=\${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     networks:
       - supabase_network
     healthcheck:
@@ -87,10 +87,10 @@ services:
     depends_on:
       db: { condition: service_healthy }
     environment:
-      - GOTRUE_OPERATOR_TOKEN=\${SUPABASE_SERVICE_ROLE_KEY}
-      - GOTRUE_DATABASE_URL=postgres://\${POSTGRES_USER}:\${POSTGRES_PASSWORD}@db:5432/\${POSTGRES_DB}
-      - GOTRUE_JWT_SECRET=\${SUPABASE_JWT_SECRET}
-      - GOTRUE_SITE_URL=\${SUPABASE_URL}
+      - GOTRUE_OPERATOR_TOKEN=${SUPABASE_SERVICE_ROLE_KEY}
+      - GOTRUE_DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - GOTRUE_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      - GOTRUE_SITE_URL=${SUPABASE_URL}
       - GOTRUE_SMTP_HOST=mailhog
       - GOTRUE_SMTP_PORT=1025
     networks:
@@ -102,10 +102,10 @@ services:
     depends_on:
       db: { condition: service_healthy }
     environment:
-      - PGRST_DB_URI=postgres://\${POSTGRES_USER}:\${POSTGRES_PASSWORD}@db:5432/\${POSTGRES_DB}
+      - PGRST_DB_URI=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       - PGRST_DB_SCHEMAS=public,storage
-      - PGRST_DB_ANON_ROLE=\${SUPABASE_ANON_KEY}
-      - PGRST_JWT_SECRET=\${SUPABASE_JWT_SECRET}
+      - PGRST_DB_ANON_ROLE=${SUPABASE_ANON_KEY}
+      - PGRST_JWT_SECRET=${SUPABASE_JWT_SECRET}
     networks:
       - supabase_network
 
@@ -115,11 +115,11 @@ services:
     ports: [ "54321:54321" ]
     environment:
       - SUPABASE_URL=http://localhost:8000
-      - SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
-      - SUPABASE_SERVICE_ROLE_KEY=\${SUPABASE_SERVICE_ROLE_KEY}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       - SUPABASE_DB_HOST=db
-      - SUPABASE_DB_USER=\${POSTGRES_USER}
-      - SUPABASE_DB_PASSWORD=\${POSTGRES_PASSWORD}
+      - SUPABASE_DB_USER=${POSTGRES_USER}
+      - SUPABASE_DB_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - supabase_network
 
@@ -168,20 +168,20 @@ Crie um arquivo `docker/.env` com o seguinte conteúdo:
 
 `
 # --- Variáveis do Banco de Dados PostgreSQL ---
-POSTGRES_USER=supabase
-POSTGRES_PASSWORD=thisIsASecurePassword123
-POSTGRES_DB=postgres
+POSTGRES_USER=SEU_USUARIO_POSTGRES
+POSTGRES_PASSWORD=SUA_SENHA_FORTE_AQUI
+POSTGRES_DB=SEU_BANCO_DE_DADOS
 
 # --- Variáveis do Supabase ---
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.M--ACd9B9x-Xfsgh3bC1hXhr3pkKO4_1j4T-QSP_d-w
-SUPABASE_JWT_SECRET=super-secret-jwt-token-with-at-least-32-characters-long
+SUPABASE_ANON_KEY=COLOQUE_SUA_SUPABASE_ANON_KEY_AQUI
+SUPABASE_SERVICE_ROLE_KEY=COLOQUE_SUA_SUPABASE_SERVICE_ROLE_KEY_AQUI
+SUPABASE_JWT_SECRET=COLOQUE_UM_JWT_SECRET_FORTE_AQUI
 SUPABASE_URL=http://localhost:8000
 
 # --- Variáveis da Aplicação ---
-DATABASE_URL="postgresql://\${POSTGRES_USER}:\${POSTGRES_PASSWORD}@db:5432/\${POSTGRES_DB}"
-NEXT_PUBLIC_SUPABASE_URL=\${SUPABASE_URL}
-NEXT_PUBLIC_SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
+DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
+NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
 `
 
 ## 2. Iniciando o Ambiente
