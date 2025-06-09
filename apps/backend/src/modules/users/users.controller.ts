@@ -10,12 +10,15 @@ import {
   Param,
   UseGuards,
 } from "@nestjs/common";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { UsersService } from "./users.service";
 import { ZodValidationPipe } from "nestjs-zod";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { AdminGuard } from "./guards/admin.guard";
 
+@ApiTags('Users')
+@ApiBearerAuth()
 @Controller("api/v1/users")
 @UseGuards(AdminGuard)
 @UsePipes(ZodValidationPipe)

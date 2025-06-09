@@ -57,7 +57,7 @@ export const AuroraBackground = ({
             pointer-events-none
             absolute
             -inset-0.5
-            opacity-50
+            opacity-50 dark:opacity-10
             will-change-transform`
           )}
         />
