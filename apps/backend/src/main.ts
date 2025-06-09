@@ -7,8 +7,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
 
+  const appName = 'API do CRM Modular';
   const config = new DocumentBuilder()
-    .setTitle('API do CRM Modular')
+    .setTitle(appName)
     .setDescription('Documentação da API para o Mono-Modular CRM')
     .setVersion('1.0')
     .addBearerAuth()
@@ -22,8 +23,13 @@ async function bootstrap() {
   const url = `http://localhost:${port}`;
   const env = process.env.NODE_ENV || 'development';
 
-  logger.log(`🚀 Servidor rodando no ambiente: ${env}`);
-  logger.log(`✅ API disponível em: ${url}`);
-  logger.log(`📚 Documentação do Swagger em: ${url}/api-docs`);
+  const border = `\n${'='.repeat(60)}`;
+  logger.log(border);
+  logger.log(`✅ ${appName} iniciada com sucesso!`);
+  logger.log(border);
+  logger.log(`\t🏠 Ambiente............: ${env}`);
+  logger.log(`\t🚀 URL da API..........: ${url}`);
+  logger.log(`\t📖 Documentação........: ${url}/api-docs`);
+  logger.log(border);
 }
 bootstrap();
