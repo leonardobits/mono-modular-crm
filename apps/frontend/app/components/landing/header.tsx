@@ -42,6 +42,15 @@ export function Header() {
           <Link href="#docs" className="text-muted-foreground transition-colors hover:text-foreground">
             Documentação
           </Link>
+          <Link href="#contributors" className="text-muted-foreground transition-colors hover:text-foreground">
+            Contribuintes
+          </Link>
+          <Link href="https://github.com/leonardobits/mono-modular-crm/wiki" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+            Wiki
+          </Link>
+          <Link href="https://github.com/users/leonardobits/projects/2" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+            Kanban
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />

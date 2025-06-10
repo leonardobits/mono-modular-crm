@@ -6,6 +6,7 @@ import { Footer } from "./components/landing/footer";
 import { Header } from "./components/landing/header";
 import { HeroSection } from "./components/landing/hero-section";
 import { TechStackSection } from "./components/landing/tech-stack-section";
+import { ContributorsSection } from "./components/landing/contributors-section";
 
 export default function ProfessionalLandingPage() {
   return (
@@ -16,6 +17,7 @@ export default function ProfessionalLandingPage() {
           <HeroSection />
           <FeaturesSection />
           <TechStackSection />
+          <ContributorsSection />
           {/* Futuras seções serão adicionadas aqui: */}
           {/* <ModularAdvantageSection /> */}
           {/* <TestimonialsSection /> */}
