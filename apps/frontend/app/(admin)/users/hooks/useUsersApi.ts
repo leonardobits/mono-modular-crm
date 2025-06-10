@@ -128,7 +128,5 @@ export const useUsersApi = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  // Funções para criar, atualizar, etc. serão adicionadas aqui
-
   return { users, isLoading, error, fetchUsers, createUser, updateUser, updateUserStatus };
 }; 

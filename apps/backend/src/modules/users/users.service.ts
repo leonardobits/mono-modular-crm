@@ -27,7 +27,6 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     const supabase = this.supabaseService.getClient();
     
-    // 1. Create user in Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: createUserDto.email,
       password: Math.random().toString(36).slice(-8), // Generate a random temporary password
@@ -51,8 +50,6 @@ export class UsersService {
       throw new InternalServerErrorException('User was not created in authentication system, but no error was reported.');
     }
 
-    // 2. The 'profiles' table should be populated by a trigger from `auth.users`
-    // We just need to fetch the newly created profile.
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('*')
@@ -61,7 +58,6 @@ export class UsersService {
 
     if (profileError) {
       console.error('Error fetching user profile after creation:', profileError);
-      // Optional: attempt to delete the auth user if profile creation fails to keep things consistent
       await supabase.auth.admin.deleteUser(authData.user.id);
       throw new InternalServerErrorException('Could not retrieve user profile after creation.');
     }
@@ -77,7 +73,6 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     const supabase = this.supabaseService.getClient();
 
-    // 1. Check if user exists
     const { data: existingUser, error: findError } = await supabase
       .from('profiles')
       .select('id')
@@ -88,7 +83,6 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found.`);
     }
 
-    // 2. Update user in Supabase Auth (if email is changed)
     if (updateUserDto.email) {
       const { error: authError } = await supabase.auth.admin.updateUserById(id, {
         email: updateUserDto.email,
@@ -100,7 +94,6 @@ export class UsersService {
       }
     }
 
-    // 3. Update user in profiles table
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .update({
@@ -122,7 +115,6 @@ export class UsersService {
   async deactivate(id: string) {
     const supabase = this.supabaseService.getClient();
 
-    // 1. Check if user exists
     const { data: existingUser, error: findError } = await supabase
       .from('profiles')
       .select('id')
@@ -133,7 +125,6 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found.`);
     }
     
-    // 2. "Ban" user in Supabase Auth
     const { error: authError } = await supabase.auth.admin.updateUserById(id, {
       ban_duration: '3650d', // 10 years, effectively permanent
     });
@@ -143,7 +134,6 @@ export class UsersService {
       throw new InternalServerErrorException('Could not deactivate user in authentication system.');
     }
 
-    // 3. Update status in profiles table
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .update({ status: 'INACTIVE' })
@@ -162,7 +152,6 @@ export class UsersService {
   async reactivate(id: string) {
     const supabase = this.supabaseService.getClient();
 
-    // 1. Check if user exists
     const { data: existingUser, error: findError } = await supabase
       .from('profiles')
       .select('id')
@@ -173,7 +162,6 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found.`);
     }
 
-    // 2. "Un-ban" user in Supabase Auth
     const { error: authError } = await supabase.auth.admin.updateUserById(id, {
       ban_duration: 'none',
     });
@@ -183,7 +171,6 @@ export class UsersService {
       throw new InternalServerErrorException('Could not reactivate user in authentication system.');
     }
 
-    // 3. Update status in profiles table
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .update({ status: 'ACTIVE' })

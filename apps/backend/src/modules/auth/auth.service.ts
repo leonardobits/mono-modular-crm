@@ -57,14 +57,10 @@ export class AuthService {
   }
 
   getProfile(user: User) {
-    // O objeto 'user' já contém as informações do usuário logado.
-    // Você pode customizar o que é retornado aqui se necessário.
     return user;
   }
 
   getSession(user: User) {
-    // A informação da "sessão" no contexto de um token JWT é o seu payload.
-    // O objeto 'user' representa esse payload.
     return user;
   }
 } 
