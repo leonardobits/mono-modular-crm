@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Cookies from 'js-cookie';
 
 export interface LoginRequest {
   email: string;
@@ -67,6 +68,7 @@ export const useAuthApi = () => {
       if (result.access_token && typeof window !== 'undefined') {
         localStorage.setItem('auth_token', result.access_token);
         localStorage.setItem('user_data', JSON.stringify(result.user));
+        Cookies.set('auth-token', result.access_token, { expires: 7, path: '/' });
       }
       
       return result;
@@ -109,16 +111,35 @@ export const useAuthApi = () => {
     }
   };
 
-  const logout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user_data');
+  const logout = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = getAuthToken();
+      if (token) {
+        await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+      }
+    } catch (err: any) {
+      // Mesmo se o logout da API falhar, o cliente deve ser limpo
+      console.error("Falha no logout da API:", err.message);
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+        Cookies.remove('auth-token', { path: '/' });
+      }
+      setIsLoading(false);
     }
   };
 
   const isAuthenticated = (): boolean => {
     if (typeof window === 'undefined') return false;
-    return !!localStorage.getItem('auth_token');
+    return !!localStorage.getItem('auth_token') || !!Cookies.get('auth-token');
   };
 
   const getCurrentUser = () => {

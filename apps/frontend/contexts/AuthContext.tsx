@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuthApi } from '@/hooks/useAuthApi';
+import { useRouter } from 'next/navigation';
 
 export interface User {
   id: string;
@@ -15,8 +16,8 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<void>;
-  logout: () => void;
+  login: (credentials: { email: string; password: string }) => Promise<boolean>;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -29,6 +30,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
   
   const { 
     login: apiLogin, 
@@ -61,16 +63,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const result = await apiLogin(credentials);
       setUser(result.user as User);
+      return true;
     } catch (error) {
-      throw error;
+      console.error("Falha no login do AuthContext:", error);
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    apiLogout();
+  const logout = async () => {
+    try {
+      await apiLogout();
+    } catch (error) {
+      console.error("Falha ao fazer logout no servidor, limpando o cliente de qualquer maneira.", error);
+    }
     setUser(null);
+    router.push('/login');
   };
 
   const refreshUser = async () => {

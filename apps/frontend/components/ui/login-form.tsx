@@ -49,16 +49,18 @@ export function LoginForm({
     }
 
     try {
-      const result = await login({ email, password })
-      
-      toast.success("Login realizado com sucesso!")
-      
-      router.push("/users")
-      
+      const success = await login({ email, password });
+      if (success) {
+        toast.success("Login realizado com sucesso!");
+        router.push("/users");
+      } else {
+        toast.error("Erro no login. Verifique suas credenciais.");
+      }
     } catch (err: any) {
-      toast.error(err.message || "Erro no login. Verifique suas credenciais.")
+      // O erro já deve ser tratado no contexto, mas por segurança:
+      toast.error(err.message || "Erro inesperado no login.");
     }
-  }
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

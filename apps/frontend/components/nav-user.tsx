@@ -32,6 +32,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useTheme } from "next-themes"
+import { useAuth } from "@/contexts/AuthContext"
 
 export function NavUser({
   user,
@@ -44,6 +45,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const { setTheme } = useTheme()
+  const { logout } = useAuth()
 
   return (
     <SidebarMenu>
@@ -113,7 +115,7 @@ export function NavUser({
                 </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={logout}>
               <LogOut />
               Sair
             </DropdownMenuItem>
