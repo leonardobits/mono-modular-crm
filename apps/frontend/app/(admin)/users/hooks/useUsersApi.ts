@@ -3,6 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CreateUserSchema, UpdateUserSchema } from "zod-schemas/user.schema";
 import { User } from '@/types/user';
+import { toast } from 'sonner';
+
+// Configuração da API
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export const useUsersApi = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -13,33 +17,33 @@ export const useUsersApi = () => {
     setIsLoading(true);
     setError(null);
     try {
-      // INÍCIO: DADOS MOCKADOS PARA TESTE
-      const mockUsers: User[] = [
-        { id: '1', name: 'Alice Smith', email: 'alice@example.com', cargo: 'ADMINISTRADOR', status: 'ATIVO' },
-        { id: '2', name: 'Bob Johnson', email: 'bob@example.com', cargo: 'GERENTE', status: 'ATIVO' },
-        { id: '3', name: 'Charlie Brown', email: 'charlie@example.com', cargo: 'ATENDENTE', status: 'INATIVO' },
-        { id: '4', name: 'Diana Prince', email: 'diana@example.com', cargo: 'ATENDENTE', status: 'ATIVO' },
-      ];
-      
-      setTimeout(() => {
-        setUsers(mockUsers);
-        setIsLoading(false);
-      }, 1000); // Simula 1 segundo de delay da rede
-      // FIM: DADOS MOCKADOS PARA TESTE
+      // Obter token de autenticação
+      const authToken = localStorage.getItem('auth_token');
+      if (!authToken) {
+        throw new Error('Token de autenticação não encontrado');
+      }
 
-      // TODO: Descomentar quando o backend estiver pronto
-      // const response = await fetch('/api/users'); 
-      // if (!response.ok) {
-      //   throw new Error('Failed to fetch users');
-      // }
-      // const data = await response.json();
-      // setUsers(data);
+      const response = await fetch(`${API_BASE_URL}/api/v1/users`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
+        throw new Error(errorData.message || 'Falha ao buscar usuários');
+      }
+
+      const users = await response.json();
+      setUsers(users);
     } catch (err: any) {
       setError(err.message);
-      // setIsLoading(false); // Já está no finally, mas se descomentar o fetch, tire o do setTimeout
     } finally {
-      // Com o setTimeout, o setIsLoading(false) é movido para dentro dele.
-      // setIsLoading(false); 
+      setIsLoading(false);
     }
   }, []);
 
@@ -47,45 +51,52 @@ export const useUsersApi = () => {
     setIsLoading(true);
     setError(null);
     try {
-      // INÍCIO: DADOS MOCKADOS PARA TESTE
-      console.log("Creating user with data:", userData);
-      const newUser: User = {
-        id: (Math.random() * 1000).toString(), // ID Fictício
-        ...userData,
-        status: 'ATIVO', // Status padrão
-      };
+      console.log('🔥 FRONTEND - createUser called with:', userData);
       
-      setTimeout(() => {
-        setUsers((prevUsers) => [...prevUsers, newUser]);
-        setIsLoading(false);
-      }, 500);
+      // Obter token de autenticação
+      const authToken = localStorage.getItem('auth_token');
+      if (!authToken) {
+        throw new Error('Token de autenticação não encontrado');
+      }
+
+      console.log('🔥 FRONTEND - Token found, making request to:', `${API_BASE_URL}/api/v1/users`);
+      console.log('🔥 FRONTEND - Request body:', JSON.stringify(userData));
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(userData),
+      });
+
+      console.log('🔥 FRONTEND - Response status:', response.status);
+      console.log('🔥 FRONTEND - Response ok:', response.ok);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
+        console.error('🔥 FRONTEND - Error response:', errorData);
+        console.error('🔥 FRONTEND - Validation errors:', errorData.errors);
+        throw new Error(errorData.message || 'Falha ao criar usuário');
+      }
+
+      const newUser = await response.json();
+      console.log('🔥 FRONTEND - Success! New user:', newUser);
       
+      // Atualiza a lista local e também força uma busca atualizada
+      setUsers((prevUsers) => [...prevUsers, newUser]);
+      // Opcionalmente recarrega a lista para garantir consistência
+      setTimeout(() => fetchUsers(), 100);
       return newUser;
-      // FIM: DADOS MOCKADOS PARA TESTE
-
-      // TODO: Descomentar quando o backend estiver pronto
-      // const response = await fetch('/api/users', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(userData),
-      // });
-
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   throw new Error(errorData.message || 'Failed to create user');
-      // }
-
-      // const newUser = await response.json();
-      // setUsers((prevUsers) => [...prevUsers, newUser]);
-      // return newUser;
     } catch (err: any) {
+      console.error('🔥 FRONTEND - Error in createUser:', err);
       setError(err.message);
       throw err; // Re-lança o erro para o formulário tratar
     } finally {
-      // Com o setTimeout, o setIsLoading(false) é movido para dentro dele.
-      // setIsLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -93,23 +104,42 @@ export const useUsersApi = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/users/${id}`, {
-        method: 'PATCH',
+      console.log('🔥 FRONTEND - updateUser called with:', { id, userData });
+      
+      // Obter token de autenticação
+      const authToken = localStorage.getItem('auth_token');
+      if (!authToken) {
+        throw new Error('Token de autenticação não encontrado');
+      }
+
+      console.log('🔥 FRONTEND - Making PUT request to:', `${API_BASE_URL}/api/v1/users/${id}`);
+      console.log('🔥 FRONTEND - Request body:', JSON.stringify(userData));
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/users/${id}`, {
+        method: 'PUT', // Usando PUT conforme especificado no PRD
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
         },
         body: JSON.stringify(userData),
       });
 
+      console.log('🔥 FRONTEND - Update response status:', response.status);
+      console.log('🔥 FRONTEND - Update response ok:', response.ok);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update user');
+        const errorData = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
+        console.error('🔥 FRONTEND - Update error response:', errorData);
+        throw new Error(errorData.message || 'Falha ao atualizar usuário');
       }
 
       const updatedUser = await response.json();
-      setUsers((prevUsers) =>
-        prevUsers.map((user) => (user.id === id ? updatedUser : user))
-      );
+      
+      // Força a busca da lista de usuários para garantir 100% de consistência
+      await fetchUsers();
+      
       return updatedUser;
     } catch (err: any) {
       setError(err.message);
@@ -117,16 +147,133 @@ export const useUsersApi = () => {
     } finally {
       setIsLoading(false);
     }
+  }, [fetchUsers]);
+
+  const updateUserPassword = useCallback(async (id: string, newPassword: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const authToken = localStorage.getItem('auth_token');
+      if (!authToken) throw new Error('Token de autenticação não encontrado');
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/users/${id}/password`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({ password: newPassword }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
+        throw new Error(errorData.message || 'Falha ao atualizar a senha');
+      }
+
+      toast.success('Senha do usuário atualizada com sucesso!');
+      return await response.json();
+    } catch (err: any) {
+      setError(err.message);
+      toast.error(`Erro ao atualizar a senha: ${err.message}`);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const updateUserStatus = useCallback(async (id: string, status: 'ATIVO' | 'INATIVO') => {
-    // Reutiliza a lógica de updateUser para a mudança de status
-    return updateUser(id, { status });
-  }, [updateUser]);
+  const deactivateUser = useCallback(async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Obter token de autenticação
+      const authToken = localStorage.getItem('auth_token');
+      if (!authToken) {
+        throw new Error('Token de autenticação não encontrado');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/users/${id}/deactivate`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
+        throw new Error(errorData.message || 'Falha ao desativar usuário');
+      }
+
+      const updatedUser = await response.json();
+      setUsers((prevUsers) =>
+        prevUsers.map((user) => (user.id === id ? updatedUser : user))
+      );
+      toast.success(`Usuário ${updatedUser.full_name} desativado com sucesso!`);
+      return updatedUser;
+    } catch (err: any) {
+      setError(err.message);
+      toast.error(`Erro ao desativar usuário: ${err.message}`);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const reactivateUser = useCallback(async (id: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Obter token de autenticação
+      const authToken = localStorage.getItem('auth_token');
+      if (!authToken) {
+        throw new Error('Token de autenticação não encontrado');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/users/${id}/reactivate`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
+        throw new Error(errorData.message || 'Falha ao reativar usuário');
+      }
+
+      const updatedUser = await response.json();
+      setUsers((prevUsers) =>
+        prevUsers.map((user) => (user.id === id ? updatedUser : user))
+      );
+      toast.success(`Usuário ${updatedUser.full_name} reativado com sucesso!`);
+      return updatedUser;
+    } catch (err: any) {
+      setError(err.message);
+      toast.error(`Erro ao reativar usuário: ${err.message}`);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const updateUserStatus = useCallback(async (id: string, status: 'ACTIVE' | 'INACTIVE') => {
+    if (status === 'INACTIVE') {
+      return deactivateUser(id);
+    } else {
+      return reactivateUser(id);
+    }
+  }, [deactivateUser, reactivateUser]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  return { users, isLoading, error, fetchUsers, createUser, updateUser, updateUserStatus };
+  return { users, isLoading, error, fetchUsers, createUser, updateUser, updateUserPassword, updateUserStatus, deactivateUser, reactivateUser };
 }; 

@@ -35,20 +35,25 @@ export function CreateUserForm({ onSubmitSuccess }: CreateUserFormProps) {
   const form = useForm<z.infer<typeof createUserSchema>>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
-      name: "",
+      fullName: "",
       email: "",
-      cargo: "ATENDENTE",
+      role: "AGENT",
     },
   })
 
   async function onSubmit(values: z.infer<typeof createUserSchema>) {
     try {
       await createUser(values)
-      toast.success("Usuário criado com sucesso!")
+      toast.success(`Usuário ${values.fullName} criado com sucesso!`)
       form.reset()
       onSubmitSuccess?.();
-    } catch (error) {
-      toast.error("Falha ao criar o usuário. Por favor, tente novamente.")
+    } catch (error: any) {
+      const errorMessage = error?.message || "Falha ao criar o usuário. Por favor, tente novamente."
+      toast.error(errorMessage)
+      
+      if (error?.details) {
+        console.error("Detalhes do erro:", error.details)
+      }
     }
   }
 
@@ -58,12 +63,12 @@ export function CreateUserForm({ onSubmitSuccess }: CreateUserFormProps) {
         {/* Campos do formulário */}
         <FormField
           control={form.control}
-          name="name"
+          name="fullName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome</FormLabel>
+              <FormLabel>Nome Completo</FormLabel>
               <FormControl>
-                <Input placeholder="John Doe" {...field} />
+                <Input placeholder="João Silva" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -76,7 +81,7 @@ export function CreateUserForm({ onSubmitSuccess }: CreateUserFormProps) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="john.doe@example.com" {...field} />
+                <Input placeholder="joao.silva@exemplo.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -84,7 +89,7 @@ export function CreateUserForm({ onSubmitSuccess }: CreateUserFormProps) {
         />
         <FormField
           control={form.control}
-          name="cargo"
+          name="role"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Cargo</FormLabel>
@@ -95,9 +100,9 @@ export function CreateUserForm({ onSubmitSuccess }: CreateUserFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="ADMINISTRADOR">Administrador</SelectItem>
-                  <SelectItem value="GERENTE">Gerente</SelectItem>
-                  <SelectItem value="ATENDENTE">Atendente</SelectItem>
+                  <SelectItem value="ADMIN">Administrador</SelectItem>
+                  <SelectItem value="MANAGER">Gerente</SelectItem>
+                  <SelectItem value="AGENT">Atendente</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

@@ -58,6 +58,10 @@ const UsersPage = () => {
           user={selectedUser}
           open={isEditModalOpen}
           onOpenChange={setIsEditModalOpen}
+          onUserUpdated={() => {
+            fetchUsers();
+            setIsEditModalOpen(false);
+          }}
         />
       )}
       <CreateUserModal

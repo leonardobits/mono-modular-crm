@@ -3,7 +3,7 @@
 // TODO: A proteção de rota foi desativada para fins de teste.
 // Descomente o código abaixo quando a autenticação do backend estiver funcional.
 
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, ReactNode } from "react";
 
@@ -12,31 +12,40 @@ interface AdminRouteGuardProps {
 }
 
 const AdminRouteGuard = ({ children }: AdminRouteGuardProps) => {
-  // const { user, isAuthenticated } = useAuth();
-  // const router = useRouter();
-  // const [isLoading, setIsLoading] = useState(true);
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
 
-  // useEffect(() => {
-  //   // Prevent flicker by waiting for auth state to be confirmed
-  //   if (isAuthenticated !== null) {
-  //     setIsLoading(false);
-  //   }
+  useEffect(() => {
+    if (!isLoading) {
+      setIsChecking(false);
+      
+      if (!isAuthenticated) {
+        router.push("/login");
+        return;
+      }
 
-  //   if (!isAuthenticated) {
-  //     router.push("/login");
-  //     return;
-  //   }
+      if (user && !['ADMIN', 'MANAGER'].includes(user.role)) {
+        router.push("/login");
+        return;
+      }
+    }
+  }, [user, isAuthenticated, isLoading, router]);
 
-  //   if (user?.role !== "admin") {
-  //     router.push("/unauthorized"); // Or some other page
-  //     return;
-  //   }
-  // }, [user, isAuthenticated, router]);
+  if (isLoading || isChecking) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Verificando autenticação...</p>
+        </div>
+      </div>
+    );
+  }
 
-  // if (isLoading || !isAuthenticated || user?.role !== "admin") {
-  //   // You can return a loader component here
-  //   return <div>Loading...</div>;
-  // }
+  if (!isAuthenticated || !user || !['ADMIN', 'MANAGER'].includes(user.role)) {
+    return null;
+  }
 
   return <>{children}</>;
 };

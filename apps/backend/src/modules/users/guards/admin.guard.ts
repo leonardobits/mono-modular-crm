@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
-import { SupabaseService } from 'src/supabase/supabase.service';
+import { SupabaseService } from '../../../supabase/supabase.service';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
@@ -19,17 +19,44 @@ export class AdminGuard implements CanActivate {
     }
 
     const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase.auth.getUser(token);
+    
+    try {
+      const { data: userData, error: authError } = await supabase.auth.getUser(token);
 
-    if (error || !data.user) {
-      throw new ForbiddenException('Invalid token or user not found.');
+      if (authError || !userData.user) {
+        throw new ForbiddenException('Invalid token or user not found.');
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role, status')
+        .eq('id', userData.user.id)
+        .single();
+
+      if (profileError || !profile) {
+        throw new ForbiddenException('User profile not found.');
+      }
+
+      if (profile.status !== 'ACTIVE') {
+        throw new ForbiddenException('User account is inactive.');
+      }
+
+      if (profile.role !== 'ADMIN') {
+        throw new ForbiddenException('You do not have administrative privileges.');
+      }
+
+      request['user'] = userData.user;
+      request['profile'] = profile;
+
+      return true;
+
+    } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw error;
+      }
+      
+      console.error('Unexpected error in AdminGuard:', error);
+      throw new ForbiddenException('Authentication failed due to unexpected error.');
     }
-
-    const userRole = data.user.user_metadata?.role;
-    if (userRole !== 'ADMINISTRADOR') {
-      throw new ForbiddenException('You do not have administrative privileges.');
-    }
-
-    return true;
   }
 } 

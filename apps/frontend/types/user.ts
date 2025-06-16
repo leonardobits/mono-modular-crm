@@ -1,7 +1,14 @@
 export interface User {
   id: string;
-  name: string;
+  full_name: string;
   email: string;
-  cargo: 'ADMINISTRADOR' | 'GERENTE' | 'ATENDENTE';
-  status: 'ATIVO' | 'INATIVO';
+  role: 'ADMIN' | 'MANAGER' | 'AGENT';
+  status: 'ACTIVE' | 'INACTIVE';
+  zip_code?: string;
+  street?: string;
+  number?: string;
+  complement?: string;
+  neighborhood?: string;
+  city?: string;
+  state?: string;
 } 

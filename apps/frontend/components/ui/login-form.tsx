@@ -13,6 +13,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useState } from "react"
+import { useAuth } from "@/contexts/AuthContext"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 
 export function LoginForm({
@@ -21,6 +24,41 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [rememberMe, setRememberMe] = useState(false)
+  
+  const { login, isLoading } = useAuth()
+  const router = useRouter()
+
+  // Controle do hCaptcha baseado no ambiente
+  const isCaptchaEnabled = process.env.NODE_ENV === 'production' && !!process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY
+  const shouldValidateCaptcha = isCaptchaEnabled && !captchaToken
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!email || !password) {
+      toast.error("Por favor, preencha todos os campos.")
+      return
+    }
+    
+    if (shouldValidateCaptcha) {
+      toast.error("Por favor, complete a verificação de segurança.")
+      return
+    }
+
+    try {
+      const result = await login({ email, password })
+      
+      toast.success("Login realizado com sucesso!")
+      
+      router.push("/users")
+      
+    } catch (err: any) {
+      toast.error(err.message || "Erro no login. Verifique suas credenciais.")
+    }
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -32,7 +70,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="email">E-mail</Label>
@@ -40,6 +78,9 @@ export function LoginForm({
                   id="email"
                   type="email"
                   placeholder="m@exemplo.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
                   required
                 />
               </div>
@@ -53,17 +94,39 @@ export function LoginForm({
                     Esqueceu sua senha?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
+                  required 
+                />
               </div>
               <div className="flex flex-col gap-3">
-                <center>
-                  <HCaptcha
-                    sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || ""}
-                    onVerify={(token) => setCaptchaToken(token)}
-                  />
-                </center>
-                <Button type="submit" className="w-full">
-                  Login
+                {/* Mostrar hCaptcha apenas em produção com chave configurada */}
+                {isCaptchaEnabled && (
+                  <center>
+                    <HCaptcha
+                      sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || ""}
+                      onVerify={(token) => setCaptchaToken(token)}
+                    />
+                  </center>
+                )}
+                
+                {/* Aviso em desenvolvimento */}
+                {!isCaptchaEnabled && process.env.NODE_ENV === 'development' && (
+                  <div className="text-sm text-muted-foreground text-center bg-muted p-2 rounded">
+                    💡 hCaptcha desabilitado em desenvolvimento
+                  </div>
+                )}
+
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={isLoading || shouldValidateCaptcha}
+                >
+                  {isLoading ? "Entrando..." : "Login"}
                 </Button>
               </div>
             </div>

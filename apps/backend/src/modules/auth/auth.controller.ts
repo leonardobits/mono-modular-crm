@@ -1,38 +1,51 @@
 import { Controller, Post, Body, ValidationPipe, HttpStatus, UseGuards, Get, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
+import { InitialAdminRegisterDto } from './dto/initial-admin-register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { User } from '@supabase/supabase-js';
 
 @ApiTags('Auth')
-@Controller('auth')
+@Controller('api/v1/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   @ApiOperation({
-    summary: 'Registrar um novo usuário',
-    description: 'Cria uma nova conta de usuário com e-mail e senha.',
+    summary: 'Registrar administrador inicial',
+    description: 'Cria a conta do primeiro administrador do sistema com perfil completo.',
   })
-  @ApiBody({ type: RegisterDto })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Usuário registrado com sucesso.' })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Dados inválidos.' })
-  async register(@Body(new ValidationPipe()) registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  @ApiBody({ type: InitialAdminRegisterDto })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Administrador registrado com sucesso.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Dados inválidos ou usuário já existe.' })
+  async register(@Body(new ValidationPipe()) registerDto: InitialAdminRegisterDto) {
+    return this.authService.registerInitialAdmin(registerDto);
   }
 
   @Post('login')
   @ApiOperation({
     summary: 'Login de usuário',
-    description: 'Autentica um usuário e retorna um token de acesso.',
+    description: 'Autentica um usuário e retorna um token de acesso JWT.',
   })
   @ApiBody({ type: LoginDto })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Login bem-sucedido, retorna token de acesso.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Login bem-sucedido, retorna token JWT.' })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Credenciais inválidas.' })
   async login(@Body(new ValidationPipe()) loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post('reset-password')
+  @ApiOperation({
+    summary: 'Iniciar reset de senha',
+    description: 'Inicia o processo de redefinição de senha enviando um e-mail ao usuário.',
+  })
+  @ApiBody({ type: ResetPasswordDto })
+  @ApiResponse({ status: HttpStatus.OK, description: 'E-mail de reset enviado com sucesso.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'E-mail não encontrado.' })
+  async resetPassword(@Body(new ValidationPipe()) resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 
   @Post('logout')
