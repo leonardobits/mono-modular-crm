@@ -270,6 +270,9 @@ export class UsersService {
       
       if (error) {
         console.error(`Error updating status for user ${id} to ${status}:`, error);
+        if (error.code === 'PGRST116') {
+          throw new NotFoundException(`User profile with ID ${id} not found for status update.`);
+        }
         throw new InternalServerErrorException(`Could not update user status.`);
       }
       
