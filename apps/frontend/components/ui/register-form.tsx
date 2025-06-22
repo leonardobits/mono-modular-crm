@@ -1,15 +1,21 @@
-'use client'
+"use client";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { PatternFormat } from 'react-number-format';
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { useState } from "react"
-import { cn } from "@/lib/utils"
-import { Loader2 } from "lucide-react"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { PatternFormat } from "react-number-format";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -18,38 +24,51 @@ import {
   FormLabel,
   FormMessage,
   FormDescription,
-} from "@/components/ui/form"
-import { toast } from "sonner"
+} from "@/components/ui/form";
+import { toast } from "sonner";
 import Link from "next/link";
-import HCaptcha from '@hcaptcha/react-hcaptcha'
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 
-const formSchema = z.object({
-  name: z.string().min(2, "O nome precisa ter pelo menos 2 caracteres."),
-  email: z.string().email("E-mail inválido."),
-  tipoPessoa: z.string().min(1, "Selecione o tipo de pessoa."),
-  dataNascimento: z.string().min(10, "A data de nascimento precisa ter pelo menos 6 caracteres."),
-  cpfCnpj: z.string().min(11, "O CPF/CNPJ precisa ter pelo menos 11 caracteres."),
-  cep: z.string().min(8, "O CEP precisa ter pelo menos 8 caracteres."),
-  Cidade: z.string().min(1, "A cidade é obrigatória."),
-  Estado: z.string().min(1, "O estado é obrigatório."),
-  endereço: z.string().min(1, "O endereço é obrigatório."),
-  numero: z.string().min(1, "O número é obrigatório."),
-  complemento: z.string().optional(),
-  password: z.string()
-    .min(8, "A senha deve ter no mínimo 8 caracteres.")
-    .regex(/[a-z]/, "A senha deve conter pelo menos uma letra minúscula.")
-    .regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula.")
-    .regex(/[0-9]/, "A senha deve conter pelo menos um número.")
-    .regex(/[^a-zA-Z0-9]/, "A senha deve conter pelo menos um caractere especial."),
-  confirmPassword: z.string().min(8, "A confirmação de senha é obrigatória."),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "As senhas não coincidem.",
-  path: ["confirmPassword"],
-});
+const formSchema = z
+  .object({
+    name: z.string().min(2, "O nome precisa ter pelo menos 2 caracteres."),
+    email: z.string().email("E-mail inválido."),
+    tipoPessoa: z.string().min(1, "Selecione o tipo de pessoa."),
+    dataNascimento: z
+      .string()
+      .min(10, "A data de nascimento precisa ter pelo menos 6 caracteres."),
+    cpfCnpj: z
+      .string()
+      .min(11, "O CPF/CNPJ precisa ter pelo menos 11 caracteres."),
+    cep: z.string().min(8, "O CEP precisa ter pelo menos 8 caracteres."),
+    Cidade: z.string().min(1, "A cidade é obrigatória."),
+    Estado: z.string().min(1, "O estado é obrigatório."),
+    endereço: z.string().min(1, "O endereço é obrigatório."),
+    numero: z.string().min(1, "O número é obrigatório."),
+    complemento: z.string().optional(),
+    password: z
+      .string()
+      .min(8, "A senha deve ter no mínimo 8 caracteres.")
+      .regex(/[a-z]/, "A senha deve conter pelo menos uma letra minúscula.")
+      .regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula.")
+      .regex(/[0-9]/, "A senha deve conter pelo menos um número.")
+      .regex(
+        /[^a-zA-Z0-9]/,
+        "A senha deve conter pelo menos um caractere especial.",
+      ),
+    confirmPassword: z.string().min(8, "A confirmação de senha é obrigatória."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
+  });
 
 type RegisterFormData = z.infer<typeof formSchema>;
 
-export function RegisterForm({ className, ...props }: React.ComponentProps<"div">) {
+export function RegisterForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   const [loading, setLoading] = useState(false);
   const [cepLoading, setCepLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -75,10 +94,20 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
   });
 
   const { setValue, getValues, watch } = form;
-  const tipoPessoa = watch('tipoPessoa');
+  const tipoPessoa = watch("tipoPessoa");
+  const isLocalhost =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1");
+  const forceHcaptchaOnLocalhost =
+    process.env.NEXT_PUBLIC_FORCE_HCAPTCHA_ON_LOCALHOST === "true";
+  const isCaptchaEnabled =
+    !!process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY &&
+    (!isLocalhost || forceHcaptchaOnLocalhost);
+  const shouldValidateCaptcha = isCaptchaEnabled && !captchaToken;
 
   const handleCepBlur = async (cepValue: string) => {
-    const cep = cepValue?.replace(/\D/g, '');
+    const cep = cepValue?.replace(/\D/g, "");
     if (!cep || cep.length !== 8) return;
 
     setCepLoading(true);
@@ -96,7 +125,10 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
         setValue("endereço", data.logradouro || "");
         setValue("Cidade", data.localidade || "");
         setValue("Estado", data.uf || "");
-        if ((!getValues("complemento") && data.complemento) || data.complemento) {
+        if (
+          (!getValues("complemento") && data.complemento) ||
+          data.complemento
+        ) {
           setValue("complemento", data.complemento || "");
         }
       }
@@ -108,14 +140,54 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
   };
 
   const onSubmit = async (data: RegisterFormData) => {
+    if (shouldValidateCaptcha) {
+      toast.error("Por favor, complete a verificação de segurança.");
+      return;
+    }
+
     setLoading(true);
     try {
-      console.log("Dados de cadastro (com captcha):", { ...data, captchaToken });
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+      const registerData = {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        tipoPessoa: data.tipoPessoa,
+        dataNascimento: data.dataNascimento,
+        cpfCnpj: data.cpfCnpj,
+        cep: data.cep,
+        cidade: data.Cidade,
+        estado: data.Estado,
+        endereco: data.endereço,
+        numero: data.numero,
+        complemento: data.complemento,
+        captchaToken: captchaToken,
+      };
+
+      const response = await fetch(`${backendUrl}/api/v1/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registerData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Erro no cadastro");
+      }
+
       toast.success("Cadastro de administrador realizado com sucesso!");
-    } catch (error) {
+      form.reset();
+      setCaptchaToken(null);
+    } catch (error: any) {
       console.error("Erro ao cadastrar administrador:", error);
-      toast.error("Ocorreu um erro ao cadastrar o administrador. Tente novamente.");
+      toast.error(
+        error.message ||
+          "Ocorreu um erro ao cadastrar o administrador. Tente novamente.",
+      );
     } finally {
       setLoading(false);
     }
@@ -139,9 +211,9 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nome Completo</FormLabel>
+                    <FormLabel>Nome</FormLabel>
                     <FormControl>
-                      <Input placeholder="Seu nome completo" {...field} />
+                      <Input placeholder="Seu nome" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -156,7 +228,11 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                   <FormItem>
                     <FormLabel>E-mail</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="seu.email@exemplo.com" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="seu.email@exemplo.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -177,7 +253,7 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                   </FormItem>
                 )}
               />
-              
+
               {/* Tipo Pessoa e CPF/CNPJ */}
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -187,7 +263,10 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                     <FormItem>
                       <FormLabel>Tipo</FormLabel>
                       {/* TODO: Substituir por um Select component */}
-                      <select {...field} className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                      <select
+                        {...field}
+                        className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      >
                         <option value="F">Física</option>
                         <option value="J">Jurídica</option>
                       </select>
@@ -200,12 +279,22 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                   name="cpfCnpj"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{tipoPessoa === 'F' ? 'CPF' : 'CNPJ'}</FormLabel>
+                      <FormLabel>
+                        {tipoPessoa === "F" ? "CPF" : "CNPJ"}
+                      </FormLabel>
                       <FormControl>
                         <PatternFormat
-                          format={tipoPessoa === 'F' ? "###.###.###-##" : "##.###.###/####-##"}
+                          format={
+                            tipoPessoa === "F"
+                              ? "###.###.###-##"
+                              : "##.###.###/####-##"
+                          }
                           customInput={Input}
-                          placeholder={tipoPessoa === 'F' ? "000.000.000-00" : "00.000.000/0000-00"}
+                          placeholder={
+                            tipoPessoa === "F"
+                              ? "000.000.000-00"
+                              : "00.000.000/0000-00"
+                          }
                           {...field}
                         />
                       </FormControl>
@@ -231,7 +320,9 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                           {...field}
                           onBlur={(e) => handleCepBlur(e.target.value)}
                         />
-                        {cepLoading && <Loader2 className="absolute right-3 top-2.5 h-5 w-5 animate-spin text-muted-foreground" />}
+                        {cepLoading && (
+                          <Loader2 className="absolute right-3 top-2.5 h-5 w-5 animate-spin text-muted-foreground" />
+                        )}
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -249,7 +340,11 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                       <FormItem>
                         <FormLabel>Endereço</FormLabel>
                         <FormControl>
-                          <Input placeholder="Sua rua, avenida..." {...field} disabled={cepLoading} />
+                          <Input
+                            placeholder="Sua rua, avenida..."
+                            {...field}
+                            disabled={cepLoading}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -270,22 +365,26 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                   )}
                 />
               </div>
-              
+
               {/* Complemento */}
               <FormField
-                  control={form.control}
-                  name="complemento"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Complemento</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Apto, bloco, casa..." {...field} disabled={cepLoading}/>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              
+                control={form.control}
+                name="complemento"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Complemento</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Apto, bloco, casa..."
+                        {...field}
+                        disabled={cepLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* Cidade e Estado */}
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -295,7 +394,11 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                     <FormItem>
                       <FormLabel>Cidade</FormLabel>
                       <FormControl>
-                        <Input placeholder="Sua cidade" {...field} disabled={cepLoading} />
+                        <Input
+                          placeholder="Sua cidade"
+                          {...field}
+                          disabled={cepLoading}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -308,14 +411,18 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                     <FormItem>
                       <FormLabel>Estado</FormLabel>
                       <FormControl>
-                        <Input placeholder="UF" {...field} disabled={cepLoading} />
+                        <Input
+                          placeholder="UF"
+                          {...field}
+                          disabled={cepLoading}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              
+
               {/* Senhas */}
               <FormField
                 control={form.control}
@@ -324,10 +431,15 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                   <FormItem>
                     <FormLabel>Senha</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                      />
                     </FormControl>
                     <FormDescription>
-                      Mínimo 8 caracteres, 1 maiúscula, 1 minúscula, 1 número, 1 especial.
+                      Mínimo 8 caracteres, 1 maiúscula, 1 minúscula, 1 número, 1
+                      especial.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -340,27 +452,51 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"div"
                   <FormItem>
                     <FormLabel>Confirmar Senha</FormLabel>
                     <FormControl>
-                      <Input 
+                      <Input
                         type="password"
-                        placeholder="••••••••" 
-                        className={cn(fieldState.error && "border-destructive focus-visible:ring-destructive")}
-                        {...field} />
+                        placeholder="••••••••"
+                        className={cn(
+                          fieldState.error &&
+                            "border-destructive focus-visible:ring-destructive",
+                        )}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <div className="flex justify-center">
-                <HCaptcha
-                  sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || ""}
-                  onVerify={setCaptchaToken}
-                />
-              </div>
+              <div className="flex flex-col gap-3">
+                {isCaptchaEnabled && (
+                  <div className="flex justify-center">
+                    <HCaptcha
+                      sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || ""}
+                      onVerify={setCaptchaToken}
+                    />
+                  </div>
+                )}
 
-              <Button type="submit" className="w-full" disabled={loading || !captchaToken}>
-                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Criar Conta"}
-              </Button>
+                {!isCaptchaEnabled && (
+                  <div className="text-sm text-muted-foreground text-center bg-muted p-2 rounded">
+                    {isLocalhost
+                      ? "💡 hCaptcha desabilitado em localhost para desenvolvimento"
+                      : "💡 hCaptcha desabilitado - Configure NEXT_PUBLIC_HCAPTCHA_SITE_KEY para habilitar"}
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loading || shouldValidateCaptcha}
+                >
+                  {loading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    "Criar Conta"
+                  )}
+                </Button>
+              </div>
             </form>
           </Form>
           <div className="mt-4 text-center text-sm">

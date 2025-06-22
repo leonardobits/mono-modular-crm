@@ -8,7 +8,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 export default function AdminLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <AuthProvider>
@@ -22,4 +22,4 @@ export default function AdminLayout({
       </SidebarProvider>
     </AuthProvider>
   );
-} 
+}

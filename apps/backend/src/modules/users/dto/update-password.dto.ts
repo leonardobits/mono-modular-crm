@@ -5,4 +5,4 @@ const UpdatePasswordSchema = z.object({
   password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres'),
 });
 
-export class UpdatePasswordDto extends createZodDto(UpdatePasswordSchema) {} 
+export class UpdatePasswordDto extends createZodDto(UpdatePasswordSchema) {}

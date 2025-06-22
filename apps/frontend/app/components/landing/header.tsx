@@ -2,7 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { motion, useAnimation, useMotionValueEvent, useScroll } from "framer-motion";
+import {
+  motion,
+  useAnimation,
+  useMotionValueEvent,
+  useScroll,
+} from "framer-motion";
 import Link from "next/link";
 
 export function Header() {
@@ -31,24 +36,46 @@ export function Header() {
     >
       <div className="container mx-auto flex h-full max-w-7xl items-center justify-between px-4">
         <div className="text-xl font-bold">
-          <Link href="/" className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+          <Link
+            href="/"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent"
+          >
             MonoModular CRM
           </Link>
         </div>
         <nav className="hidden items-center gap-6 md:flex">
-          <Link href="#features" className="text-muted-foreground transition-colors hover:text-foreground">
+          <Link
+            href="#features"
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
             Recursos
           </Link>
-          <Link href="#docs" className="text-muted-foreground transition-colors hover:text-foreground">
+          <Link
+            href="#docs"
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
             Documentação
           </Link>
-          <Link href="#contributors" className="text-muted-foreground transition-colors hover:text-foreground">
+          <Link
+            href="#contributors"
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
             Contribuintes
           </Link>
-          <Link href="https://github.com/leonardobits/mono-modular-crm/wiki" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+          <Link
+            href="https://github.com/leonardobits/mono-modular-crm/wiki"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
             Wiki
           </Link>
-          <Link href="https://github.com/users/leonardobits/projects/2" target="_blank" rel="noopener noreferrer" className="text-muted-foreground transition-colors hover:text-foreground">
+          <Link
+            href="https://github.com/users/leonardobits/projects/2"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
             Kanban
           </Link>
         </nav>
@@ -57,7 +84,10 @@ export function Header() {
           <Button asChild variant="ghost">
             <Link href="/login">Login</Link>
           </Button>
-          <Button asChild className="group relative bg-gradient-to-r from-blue-500 to-purple-500 text-primary-foreground">
+          <Button
+            asChild
+            className="group relative bg-gradient-to-r from-blue-500 to-purple-500 text-primary-foreground"
+          >
             <Link href="/register">
               <span className="absolute h-full w-full rounded-md bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100"></span>
               <span className="relative">Registrar-se</span>
@@ -67,4 +97,4 @@ export function Header() {
       </div>
     </motion.header>
   );
-} 
+}

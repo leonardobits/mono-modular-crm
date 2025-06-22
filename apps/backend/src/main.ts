@@ -8,7 +8,7 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-  
+
   app.enableCors({
     origin: [frontendUrl, 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -42,4 +42,7 @@ async function bootstrap() {
   logger.log(`\t🌐 Frontend URL........: ${frontendUrl}`);
   logger.log(border);
 }
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('Erro ao inicializar a aplicação:', error);
+  process.exit(1);
+});

@@ -10,7 +10,9 @@ export class SupabaseService {
   constructor(private configService: ConfigService) {
     const supabaseUrl = this.configService.get<string>('supabase.supabaseUrl');
     const supabaseKey = this.configService.get<string>('supabase.supabaseKey');
-    const supabaseServiceKey = this.configService.get<string>('supabase.supabaseServiceKey');
+    const supabaseServiceKey = this.configService.get<string>(
+      'supabase.supabaseServiceKey',
+    );
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Missing Supabase credentials');
@@ -22,8 +24,8 @@ export class SupabaseService {
       this.adminSupabase = createClient(supabaseUrl, supabaseServiceKey, {
         auth: {
           autoRefreshToken: false,
-          persistSession: false
-        }
+          persistSession: false,
+        },
       });
     }
   }
@@ -34,9 +36,11 @@ export class SupabaseService {
 
   getAdminClient(): SupabaseClient {
     if (!this.adminSupabase) {
-      console.warn('Admin Supabase client not available, falling back to regular client');
+      console.warn(
+        'Admin Supabase client not available, falling back to regular client',
+      );
       return this.supabase;
     }
     return this.adminSupabase;
   }
-} 
+}

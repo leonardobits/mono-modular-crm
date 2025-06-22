@@ -50,7 +50,8 @@ export function HeroSection() {
           </p>
         </div>
         <p className="max-w-xl text-center text-lg text-muted-foreground">
-          Cansado de plataformas rígidas? Molde nosso CRM modular às suas necessidades e seja dono da sua inovação.
+          Cansado de plataformas rígidas? Molde nosso CRM modular às suas
+          necessidades e seja dono da sua inovação.
         </p>
         <div className="flex items-center gap-4 py-4">
           <Button
@@ -70,4 +71,4 @@ export function HeroSection() {
       </motion.div>
     </section>
   );
-} 
+}

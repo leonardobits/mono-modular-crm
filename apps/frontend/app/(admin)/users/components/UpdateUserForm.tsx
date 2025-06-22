@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { toast } from "sonner"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,22 +13,26 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { updateUserSchema } from "zod-schemas/user.schema"
-import { useUsersApi } from "../hooks/useUsersApi"
-import { User } from "@/types/user"
+} from "@/components/ui/select";
+import { updateUserSchema } from "zod-schemas/user.schema";
+import { useUsersApi } from "../hooks/useUsersApi";
+import { User } from "@/types/user";
 
 // Estende o schema para incluir um campo de senha opcional para o formulário
 const formSchema = updateUserSchema.extend({
-  password: z.string().min(8, "A senha deve ter pelo menos 8 caracteres.").optional().or(z.literal('')),
+  password: z
+    .string()
+    .min(8, "A senha deve ter pelo menos 8 caracteres.")
+    .optional()
+    .or(z.literal("")),
 });
 
 interface UpdateUserFormProps {
@@ -36,7 +40,10 @@ interface UpdateUserFormProps {
   onSubmitSuccess?: () => void;
 }
 
-export function UpdateUserForm({ initialData, onSubmitSuccess }: UpdateUserFormProps) {
+export function UpdateUserForm({
+  initialData,
+  onSubmitSuccess,
+}: UpdateUserFormProps) {
   const { updateUser, updateUserPassword, isLoading } = useUsersApi();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -48,7 +55,7 @@ export function UpdateUserForm({ initialData, onSubmitSuccess }: UpdateUserFormP
       status: initialData.status,
       password: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -64,11 +71,15 @@ export function UpdateUserForm({ initialData, onSubmitSuccess }: UpdateUserFormP
 
       await Promise.all(promises);
 
-      toast.success(`Usuário ${updateData.fullName || initialData.full_name} atualizado com sucesso!`);
+      toast.success(
+        `Usuário ${updateData.fullName || initialData.full_name} atualizado com sucesso!`,
+      );
       onSubmitSuccess?.();
     } catch (error: any) {
-      const errorMessage = error?.message || "Falha ao atualizar o usuário. Por favor, tente novamente."
-      toast.error(errorMessage)
+      const errorMessage =
+        error?.message ||
+        "Falha ao atualizar o usuário. Por favor, tente novamente.";
+      toast.error(errorMessage);
     }
   }
 
@@ -152,7 +163,11 @@ export function UpdateUserForm({ initialData, onSubmitSuccess }: UpdateUserFormP
             <FormItem>
               <FormLabel>Nova Senha (Opcional)</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Deixe em branco para não alterar" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Deixe em branco para não alterar"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -163,5 +178,5 @@ export function UpdateUserForm({ initialData, onSubmitSuccess }: UpdateUserFormP
         </Button>
       </form>
     </Form>
-  )
-} 
+  );
+}

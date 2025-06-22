@@ -8,12 +8,18 @@ import { ExternalLink, GitBranch, GitCommit, Heart, Users } from "lucide-react";
 import { motion } from "framer-motion";
 
 // Componente Badge inline
-const Badge = ({ children, className = "", variant = "secondary" }: { 
-  children: React.ReactNode; 
-  className?: string; 
+const Badge = ({
+  children,
+  className = "",
+  variant = "secondary",
+}: {
+  children: React.ReactNode;
+  className?: string;
   variant?: string;
 }) => (
-  <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${className}`}>
+  <div
+    className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${className}`}
+  >
     {children}
   </div>
 );
@@ -56,7 +62,7 @@ export function ContributorsSection() {
         const repoResponse = await fetch(
           `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`,
         );
-        
+
         if (!repoResponse.ok) {
           throw new Error("Falha ao carregar informações do repositório");
         }
@@ -93,9 +99,12 @@ export function ContributorsSection() {
   }, []);
 
   const getContributionLevel = (contributions: number) => {
-    if (contributions >= 100) return { level: "Mantenedor", color: "bg-purple-500" };
-    if (contributions >= 50) return { level: "Contribuidor Ativo", color: "bg-blue-500" };
-    if (contributions >= 10) return { level: "Contribuidor", color: "bg-green-500" };
+    if (contributions >= 100)
+      return { level: "Mantenedor", color: "bg-purple-500" };
+    if (contributions >= 50)
+      return { level: "Contribuidor Ativo", color: "bg-blue-500" };
+    if (contributions >= 10)
+      return { level: "Contribuidor", color: "bg-green-500" };
     return { level: "Colaborador", color: "bg-gray-500" };
   };
 
@@ -147,11 +156,17 @@ export function ContributorsSection() {
               {error}
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Visite nosso repositório no GitHub para ver todos os contribuintes.
+              Visite nosso repositório no GitHub para ver todos os
+              contribuintes.
             </p>
             <Button
               className="mt-4"
-              onClick={() => window.open(`https://github.com/${REPO_OWNER}/${REPO_NAME}`, "_blank")}
+              onClick={() =>
+                window.open(
+                  `https://github.com/${REPO_OWNER}/${REPO_NAME}`,
+                  "_blank",
+                )
+              }
             >
               <ExternalLink className="mr-2 h-4 w-4" />
               Ver no GitHub
@@ -173,7 +188,8 @@ export function ContributorsSection() {
             </span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Conheça as pessoas incríveis que tornam este projeto possível. Cada contribuição faz a diferença!
+            Conheça as pessoas incríveis que tornam este projeto possível. Cada
+            contribuição faz a diferença!
           </p>
         </div>
 
@@ -228,8 +244,10 @@ export function ContributorsSection() {
         {/* Grade de Contribuintes */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {contributors.map((contributor, index) => {
-            const { level, color } = getContributionLevel(contributor.contributions);
-            
+            const { level, color } = getContributionLevel(
+              contributor.contributions,
+            );
+
             return (
               <motion.div
                 key={contributor.id}
@@ -243,7 +261,10 @@ export function ContributorsSection() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center space-x-4">
                         <Avatar className="h-12 w-12 border-2 border-primary/20 transition-all duration-300 group-hover:border-primary/50">
-                          <AvatarImage src={contributor.avatar_url} alt={contributor.login} />
+                          <AvatarImage
+                            src={contributor.avatar_url}
+                            alt={contributor.login}
+                          />
                           <AvatarFallback>
                             {contributor.login.slice(0, 2).toUpperCase()}
                           </AvatarFallback>
@@ -261,14 +282,19 @@ export function ContributorsSection() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => window.open(contributor.html_url, "_blank")}
+                        onClick={() =>
+                          window.open(contributor.html_url, "_blank")
+                        }
                         className="opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                       >
                         <ExternalLink className="h-4 w-4" />
                       </Button>
                     </div>
                     <div className="mt-4">
-                      <Badge variant="secondary" className={`${color} text-white`}>
+                      <Badge
+                        variant="secondary"
+                        className={`${color} text-white`}
+                      >
                         {level}
                       </Badge>
                     </div>
@@ -282,7 +308,12 @@ export function ContributorsSection() {
         {/* Botão para ver mais */}
         <div className="mt-12 text-center">
           <Button
-            onClick={() => window.open(`https://github.com/${REPO_OWNER}/${REPO_NAME}/graphs/contributors`, "_blank")}
+            onClick={() =>
+              window.open(
+                `https://github.com/${REPO_OWNER}/${REPO_NAME}/graphs/contributors`,
+                "_blank",
+              )
+            }
             size="lg"
             className="group relative bg-gradient-to-r from-blue-500 to-purple-500 text-primary-foreground"
           >
@@ -296,4 +327,4 @@ export function ContributorsSection() {
       </div>
     </section>
   );
-} 
+}

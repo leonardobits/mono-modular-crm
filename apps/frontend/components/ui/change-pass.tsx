@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
-  Card, 
+  Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,  
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -22,26 +22,26 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Loader2 } from "lucide-react"
-import { toast } from "sonner"
-import { useAuthApi } from "@/hooks/useAuthApi"
-import Link from "next/link"
+} from "@/components/ui/form";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useAuthApi } from "@/hooks/useAuthApi";
+import Link from "next/link";
 
 // Schema para o reset de senha
 const resetPasswordSchema = z.object({
   email: z.string().email("E-mail inválido."),
-})
+});
 
-type ResetPasswordData = z.infer<typeof resetPasswordSchema>
+type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
 
 export function ChangePass({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [isSuccessful, setIsSuccessful] = useState(false)
-  
-  const { resetPassword, isLoading } = useAuthApi()
+  const [isSuccessful, setIsSuccessful] = useState(false);
+
+  const { resetPassword, isLoading } = useAuthApi();
 
   const form = useForm<ResetPasswordData>({
     resolver: zodResolver(resetPasswordSchema),
@@ -49,19 +49,23 @@ export function ChangePass({
     defaultValues: {
       email: "",
     },
-  })
+  });
 
   const onSubmit = async (data: ResetPasswordData) => {
     try {
-      await resetPassword(data)
-      
-      setIsSuccessful(true)
-      toast.success("Instruções de redefinição de senha foram enviadas para seu e-mail!")
-      
+      await resetPassword(data);
+
+      setIsSuccessful(true);
+      toast.success(
+        "Instruções de redefinição de senha foram enviadas para seu e-mail!",
+      );
     } catch (error: any) {
-      toast.error(error.message || "Erro ao solicitar redefinição de senha. Tente novamente.")
+      toast.error(
+        error.message ||
+          "Erro ao solicitar redefinição de senha. Tente novamente.",
+      );
     }
-  }
+  };
 
   if (isSuccessful) {
     return (
@@ -76,18 +80,17 @@ export function ChangePass({
           <CardContent>
             <div className="text-center space-y-4">
               <p className="text-muted-foreground">
-                Verificque sua caixa de entrada e siga as instruções para redefinir sua senha.
+                Verificque sua caixa de entrada e siga as instruções para
+                redefinir sua senha.
               </p>
               <Link href="/login">
-                <Button className="w-full">
-                  Voltar para Login
-                </Button>
+                <Button className="w-full">Voltar para Login</Button>
               </Link>
             </div>
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -121,11 +124,7 @@ export function ChangePass({
                 )}
               />
 
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -137,7 +136,7 @@ export function ChangePass({
               </Button>
             </form>
           </Form>
-          
+
           <div className="mt-4 text-center text-sm">
             Lembrou da senha?{" "}
             <Link href="/login" className="underline underline-offset-4">
@@ -147,6 +146,5 @@ export function ChangePass({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

@@ -2,8 +2,8 @@ export interface User {
   id: string;
   full_name: string;
   email: string;
-  role: 'ADMIN' | 'MANAGER' | 'AGENT';
-  status: 'ACTIVE' | 'INACTIVE';
+  role: "ADMIN" | "MANAGER" | "AGENT";
+  status: "ACTIVE" | "INACTIVE";
   zip_code?: string;
   street?: string;
   number?: string;
@@ -11,4 +11,4 @@ export interface User {
   neighborhood?: string;
   city?: string;
   state?: string;
-} 
+}

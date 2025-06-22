@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   BadgeCheck,
@@ -9,13 +9,9 @@ import {
   Sparkles,
   Moon,
   Sun,
-} from "lucide-react"
+} from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,28 +20,28 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { useTheme } from "next-themes"
-import { useAuth } from "@/contexts/AuthContext"
+} from "@/components/ui/sidebar";
+import { useTheme } from "next-themes";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    email: string
-    avatar: string
-  }
+    name: string;
+    email: string;
+    avatar: string;
+  };
 }) {
-  const { isMobile } = useSidebar()
-  const { setTheme } = useTheme()
-  const { logout } = useAuth()
+  const { isMobile } = useSidebar();
+  const { setTheme } = useTheme();
+  const { logout } = useAuth();
 
   return (
     <SidebarMenu>
@@ -98,21 +94,21 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-                <DropdownMenuLabel className="px-2 py-1.5 text-xs font-normal">
-                    Tema
-                </DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                    <Sun className="mr-2 h-4 w-4" />
-                    <span>Claro</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                    <Moon className="mr-2 h-4 w-4" />
-                    <span>Escuro</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    <span>Sistema</span>
-                </DropdownMenuItem>
+              <DropdownMenuLabel className="px-2 py-1.5 text-xs font-normal">
+                Tema
+              </DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => setTheme("light")}>
+                <Sun className="mr-2 h-4 w-4" />
+                <span>Claro</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
+                <Moon className="mr-2 h-4 w-4" />
+                <span>Escuro</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                <span>Sistema</span>
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout}>
@@ -123,5 +119,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  ForbiddenException,
+} from '@nestjs/common';
 import { SupabaseService } from '../../../supabase/supabase.service';
 
 @Injectable()
@@ -19,9 +24,10 @@ export class AdminGuard implements CanActivate {
     }
 
     const supabase = this.supabaseService.getClient();
-    
+
     try {
-      const { data: userData, error: authError } = await supabase.auth.getUser(token);
+      const { data: userData, error: authError } =
+        await supabase.auth.getUser(token);
 
       if (authError || !userData.user) {
         throw new ForbiddenException('Invalid token or user not found.');
@@ -42,21 +48,24 @@ export class AdminGuard implements CanActivate {
       }
 
       if (profile.role !== 'ADMIN') {
-        throw new ForbiddenException('You do not have administrative privileges.');
+        throw new ForbiddenException(
+          'You do not have administrative privileges.',
+        );
       }
 
       request['user'] = userData.user;
       request['profile'] = profile;
 
       return true;
-
     } catch (error) {
       if (error instanceof ForbiddenException) {
         throw error;
       }
-      
+
       console.error('Unexpected error in AdminGuard:', error);
-      throw new ForbiddenException('Authentication failed due to unexpected error.');
+      throw new ForbiddenException(
+        'Authentication failed due to unexpected error.',
+      );
     }
   }
-} 
+}

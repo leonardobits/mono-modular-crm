@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import Cookies from 'js-cookie';
+import { useState } from "react";
+import Cookies from "js-cookie";
 
 export interface LoginRequest {
   email: string;
@@ -11,7 +11,7 @@ export interface LoginRequest {
 export interface RegisterRequest {
   fullName: string;
   email: string;
-  role: 'ADMIN' | 'MANAGER' | 'AGENT';
+  role: "ADMIN" | "MANAGER" | "AGENT";
 }
 
 export interface ResetPasswordRequest {
@@ -34,17 +34,21 @@ export interface AuthError {
   statusCode?: number;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export const useAuthApi = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const apiCall = async (endpoint: string, method: string = 'GET', body?: any) => {
+  const apiCall = async (
+    endpoint: string,
+    method: string = "GET",
+    body?: any,
+  ) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: body ? JSON.stringify(body) : undefined,
     });
@@ -53,7 +57,9 @@ export const useAuthApi = () => {
       const errorData = await response.json().catch(() => ({
         message: `HTTP ${response.status}: ${response.statusText}`,
       }));
-      throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(
+        errorData.message || `HTTP ${response.status}: ${response.statusText}`,
+      );
     }
 
     return response.json();
@@ -63,17 +69,20 @@ export const useAuthApi = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await apiCall('/api/v1/auth/login', 'POST', loginData);
-      
-      if (result.access_token && typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', result.access_token);
-        localStorage.setItem('user_data', JSON.stringify(result.user));
-        Cookies.set('auth-token', result.access_token, { expires: 7, path: '/' });
+      const result = await apiCall("/api/v1/auth/login", "POST", loginData);
+
+      if (result.access_token && typeof window !== "undefined") {
+        localStorage.setItem("auth_token", result.access_token);
+        localStorage.setItem("user_data", JSON.stringify(result.user));
+        Cookies.set("auth-token", result.access_token, {
+          expires: 7,
+          path: "/",
+        });
       }
-      
+
       return result;
     } catch (err: any) {
-      const errorMessage = err.message || 'Falha no login';
+      const errorMessage = err.message || "Falha no login";
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -85,10 +94,14 @@ export const useAuthApi = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await apiCall('/api/v1/auth/register', 'POST', registerData);
+      const result = await apiCall(
+        "/api/v1/auth/register",
+        "POST",
+        registerData,
+      );
       return result;
     } catch (err: any) {
-      const errorMessage = err.message || 'Falha no registro';
+      const errorMessage = err.message || "Falha no registro";
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -96,14 +109,20 @@ export const useAuthApi = () => {
     }
   };
 
-  const resetPassword = async (resetData: ResetPasswordRequest): Promise<any> => {
+  const resetPassword = async (
+    resetData: ResetPasswordRequest,
+  ): Promise<any> => {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await apiCall('/api/v1/auth/reset-password', 'POST', resetData);
+      const result = await apiCall(
+        "/api/v1/auth/reset-password",
+        "POST",
+        resetData,
+      );
       return result;
     } catch (err: any) {
-      const errorMessage = err.message || 'Falha ao solicitar reset de senha';
+      const errorMessage = err.message || "Falha ao solicitar reset de senha";
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -118,9 +137,9 @@ export const useAuthApi = () => {
       const token = getAuthToken();
       if (token) {
         await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
       }
@@ -128,29 +147,29 @@ export const useAuthApi = () => {
       // Mesmo se o logout da API falhar, o cliente deve ser limpo
       console.error("Falha no logout da API:", err.message);
     } finally {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user_data');
-        Cookies.remove('auth-token', { path: '/' });
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("user_data");
+        Cookies.remove("auth-token", { path: "/" });
       }
       setIsLoading(false);
     }
   };
 
   const isAuthenticated = (): boolean => {
-    if (typeof window === 'undefined') return false;
-    return !!localStorage.getItem('auth_token') || !!Cookies.get('auth-token');
+    if (typeof window === "undefined") return false;
+    return !!localStorage.getItem("auth_token") || !!Cookies.get("auth-token");
   };
 
   const getCurrentUser = () => {
-    if (typeof window === 'undefined') return null;
-    const userData = localStorage.getItem('user_data');
+    if (typeof window === "undefined") return null;
+    const userData = localStorage.getItem("user_data");
     return userData ? JSON.parse(userData) : null;
   };
 
   const getAuthToken = (): string | null => {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('auth_token');
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("auth_token");
   };
 
   return {

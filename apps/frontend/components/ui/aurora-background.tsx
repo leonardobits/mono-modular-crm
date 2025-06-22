@@ -37,7 +37,7 @@ export const AuroraBackground = ({
     <div
       className={cn(
         "relative flex h-full min-h-screen w-full flex-col bg-background text-foreground transition-colors duration-300",
-        className
+        className,
       )}
       onMouseMove={handleMouseMove}
       {...props}
@@ -58,7 +58,7 @@ export const AuroraBackground = ({
             absolute
             -inset-0.5
             opacity-50 dark:opacity-10
-            will-change-transform`
+            will-change-transform`,
           )}
         />
       </div>
@@ -73,9 +73,10 @@ export const AuroraBackground = ({
                 "radial-gradient(var(--size) circle at var(--x) var(--y), var(--aurora-secondary), transparent 100%)",
             } as React.CSSProperties
           }
+          suppressHydrationWarning
         />
       )}
       <div className="relative z-10">{children}</div>
     </div>
   );
-}; 
+};

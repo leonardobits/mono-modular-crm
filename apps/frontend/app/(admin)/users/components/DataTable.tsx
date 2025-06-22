@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -11,7 +11,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -20,21 +20,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  meta?: any
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  meta?: any;
 }
 
 export function DataTable<TData, TValue>({
@@ -42,8 +42,10 @@ export function DataTable<TData, TValue>({
   data,
   meta,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  );
 
   const table = useReactTable({
     data,
@@ -59,7 +61,7 @@ export function DataTable<TData, TValue>({
       columnFilters,
     },
     meta,
-  })
+  });
 
   return (
     <div className="px-4">
@@ -73,9 +75,13 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         />
         <Select
-          value={(table.getColumn("status")?.getFilterValue() as string) ?? "all"}
+          value={
+            (table.getColumn("status")?.getFilterValue() as string) ?? "all"
+          }
           onValueChange={(value) =>
-            table.getColumn("status")?.setFilterValue(value === "all" ? undefined : value)
+            table
+              .getColumn("status")
+              ?.setFilterValue(value === "all" ? undefined : value)
           }
         >
           <SelectTrigger className="w-[180px]">
@@ -103,10 +109,10 @@ export function DataTable<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -120,14 +126,20 @@ export function DataTable<TData, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   Nenhum resultado.
                 </TableCell>
               </TableRow>
@@ -154,5 +166,5 @@ export function DataTable<TData, TValue>({
         </Button>
       </div>
     </div>
-  )
-} 
+  );
+}

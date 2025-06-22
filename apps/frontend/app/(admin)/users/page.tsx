@@ -1,30 +1,45 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useUsersApi } from './hooks/useUsersApi';
-import { DataTable } from './components/DataTable';
-import { columns } from './components/columns';
-import { User } from '@/types/user';
-import { EditUserModal } from './components/EditUserModal';
-import { AdminPageHeader, BreadcrumbItemProps } from '@/components/admin-page-header';
-import { Button } from '@/components/ui/button';
-import { CreateUserModal } from './components/CreateUserModal';
-import { LoadingBar } from '@/components/ui/loading-bar';
+import React, { useState, useCallback } from "react";
+import { useUsersApi } from "./hooks/useUsersApi";
+import { DataTable } from "./components/DataTable";
+import { columns } from "./components/columns";
+import { User } from "@/types/user";
+import { EditUserModal } from "./components/EditUserModal";
+import {
+  AdminPageHeader,
+  BreadcrumbItemProps,
+} from "@/components/admin-page-header";
+import { Button } from "@/components/ui/button";
+import { CreateUserModal } from "./components/CreateUserModal";
+import { LoadingBar } from "@/components/ui/loading-bar";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
 const UsersPage = () => {
-  const { users, isLoading, error, updateUser, updateUserStatus, fetchUsers } = useUsersApi();
+  const { users, isLoading, error, updateUser, updateUserStatus, fetchUsers } =
+    useUsersApi();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const handleEditUser = (user: User) => {
+  const handleEditUser = useCallback((user: User) => {
     setSelectedUser(user);
     setIsEditModalOpen(true);
-  };
+  }, []);
 
-  const handleCreateUser = () => {
+  const handleCreateUser = useCallback(() => {
     setIsCreateModalOpen(true);
-  };
+  }, []);
+
+  const handleUserUpdated = useCallback(() => {
+    fetchUsers();
+    setIsEditModalOpen(false);
+  }, [fetchUsers]);
+
+  const handleUserCreated = useCallback(() => {
+    fetchUsers();
+    setIsCreateModalOpen(false);
+  }, [fetchUsers]);
 
   if (isLoading) {
     return <LoadingBar />;
@@ -35,13 +50,16 @@ const UsersPage = () => {
   }
 
   const breadcrumbs: BreadcrumbItemProps[] = [
-    { label: 'Admin', href: '/admin' },
-    { label: 'Usuários' },
+    { label: "Admin", href: "/admin" },
+    { label: "Usuários" },
   ];
 
   return (
-    <>
-      <AdminPageHeader title="Gerenciamento de Usuários" breadcrumbs={breadcrumbs}>
+    <AuthGuard requireAuth={true}>
+      <AdminPageHeader
+        title="Gerenciamento de Usuários"
+        breadcrumbs={breadcrumbs}
+      >
         <Button onClick={handleCreateUser}>Criar Usuário</Button>
       </AdminPageHeader>
       <DataTable
@@ -58,19 +76,16 @@ const UsersPage = () => {
           user={selectedUser}
           open={isEditModalOpen}
           onOpenChange={setIsEditModalOpen}
-          onUserUpdated={() => {
-            fetchUsers();
-            setIsEditModalOpen(false);
-          }}
+          onUserUpdated={handleUserUpdated}
         />
       )}
       <CreateUserModal
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
-        onUserCreated={fetchUsers}
+        onUserCreated={handleUserCreated}
       />
-    </>
+    </AuthGuard>
   );
 };
 
-export default UsersPage; 
+export default UsersPage;

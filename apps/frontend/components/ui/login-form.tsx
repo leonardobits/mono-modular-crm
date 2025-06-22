@@ -1,51 +1,57 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { useState } from "react"
-import { useAuth } from "@/contexts/AuthContext"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
-  
-  const { login, isLoading } = useAuth()
-  const router = useRouter()
+  const { login, isLoading } = useAuth();
+  const router = useRouter();
 
-  // Controle do hCaptcha baseado no ambiente
-  const isCaptchaEnabled = process.env.NODE_ENV === 'production' && !!process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY
-  const shouldValidateCaptcha = isCaptchaEnabled && !captchaToken
+  // Controle do hCaptcha baseado na chave estar configurada
+  const isLocalhost =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1");
+  const forceHcaptchaOnLocalhost =
+    process.env.NEXT_PUBLIC_FORCE_HCAPTCHA_ON_LOCALHOST === "true";
+  const isCaptchaEnabled =
+    !!process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY &&
+    (!isLocalhost || forceHcaptchaOnLocalhost);
+  const shouldValidateCaptcha = isCaptchaEnabled && !captchaToken;
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (!email || !password) {
-      toast.error("Por favor, preencha todos os campos.")
-      return
+      toast.error("Por favor, preencha todos os campos.");
+      return;
     }
-    
+
     if (shouldValidateCaptcha) {
-      toast.error("Por favor, complete a verificação de segurança.")
-      return
+      toast.error("Por favor, complete a verificação de segurança.");
+      return;
     }
 
     try {
@@ -96,13 +102,13 @@ export function LoginForm({
                     Esqueceu sua senha?
                   </a>
                 </div>
-                <Input 
-                  id="password" 
-                  type="password" 
+                <Input
+                  id="password"
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
-                  required 
+                  required
                 />
               </div>
               <div className="flex flex-col gap-3">
@@ -115,16 +121,18 @@ export function LoginForm({
                     />
                   </center>
                 )}
-                
-                {/* Aviso em desenvolvimento */}
-                {!isCaptchaEnabled && process.env.NODE_ENV === 'development' && (
+
+                {/* Aviso quando hCaptcha não está configurado */}
+                {!isCaptchaEnabled && (
                   <div className="text-sm text-muted-foreground text-center bg-muted p-2 rounded">
-                    💡 hCaptcha desabilitado em desenvolvimento
+                    {isLocalhost
+                      ? "💡 hCaptcha desabilitado em localhost para desenvolvimento"
+                      : "💡 hCaptcha desabilitado - Configure NEXT_PUBLIC_HCAPTCHA_SITE_KEY para habilitar"}
                   </div>
                 )}
 
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full"
                   disabled={isLoading || shouldValidateCaptcha}
                 >
@@ -142,5 +150,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

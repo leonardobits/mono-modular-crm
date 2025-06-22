@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ChevronsUpDown, Plus } from "lucide-react"
+import * as React from "react";
+import { ChevronsUpDown, Plus } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -11,30 +11,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 export function TeamSwitcher({
   teams,
 }: {
   teams: {
-    name: string
-    logo: React.ElementType
-    plan: string
-  }[]
+    name: string;
+    logo: React.ElementType;
+    plan: string;
+  }[];
 }) {
-  const { isMobile, state } = useSidebar()
-  const isCollapsed = state === "collapsed"
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const { isMobile, state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+  const [activeTeam, setActiveTeam] = React.useState(teams[0]);
 
   if (!activeTeam) {
-    return null
+    return null;
   }
 
   return (
@@ -46,7 +46,7 @@ export function TeamSwitcher({
               size="lg"
               className={cn(
                 "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
-                isCollapsed && "justify-center"
+                isCollapsed && "justify-center",
               )}
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
@@ -55,7 +55,7 @@ export function TeamSwitcher({
               <div
                 className={cn(
                   "grid flex-1 text-left text-sm leading-tight",
-                  isCollapsed && "hidden"
+                  isCollapsed && "hidden",
                 )}
               >
                 <span className="truncate font-medium">{activeTeam.name}</span>
@@ -93,11 +93,13 @@ export function TeamSwitcher({
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <Plus className="size-4" />
               </div>
-              <div className="text-muted-foreground font-medium">Add módulo</div>
+              <div className="text-muted-foreground font-medium">
+                Add módulo
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

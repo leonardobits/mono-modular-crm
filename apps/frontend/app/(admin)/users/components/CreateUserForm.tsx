@@ -35,16 +35,19 @@ export function CreateUserForm({ onSubmitSuccess }: CreateUserFormProps) {
   const form = useForm<z.infer<typeof createUserSchema>>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
-      fullName: "",
+      name: "",
       email: "",
       role: "AGENT",
+      password: "",
+      confirmPassword: "",
+      sendWelcomeEmail: true,
     },
   })
 
   async function onSubmit(values: z.infer<typeof createUserSchema>) {
     try {
       await createUser(values)
-      toast.success(`Usuário ${values.fullName} criado com sucesso!`)
+      toast.success(`Usuário ${values.name} criado com sucesso!`)
       form.reset()
       onSubmitSuccess?.();
     } catch (error: any) {
@@ -59,11 +62,10 @@ export function CreateUserForm({ onSubmitSuccess }: CreateUserFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {/* Campos do formulário */}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="fullName"
+          name="name"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Nome Completo</FormLabel>
@@ -81,7 +83,7 @@ export function CreateUserForm({ onSubmitSuccess }: CreateUserFormProps) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="joao.silva@exemplo.com" {...field} />
+                <Input placeholder="joao.silva@exemplo.com" type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -109,8 +111,34 @@ export function CreateUserForm({ onSubmitSuccess }: CreateUserFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Enviando..." : "Enviar"}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Senha</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite a senha" type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirmar Senha</FormLabel>
+              <FormControl>
+                <Input placeholder="Confirme a senha" type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={isLoading} className="w-full">
+          {isLoading ? "Criando..." : "Criar Usuário"}
         </Button>
       </form>
     </Form>

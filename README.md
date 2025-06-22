@@ -10,6 +10,7 @@ Antes de começar, certifique-se de ter instalado:
 - [PNPM](https://pnpm.io/) (v10.8.2 ou superior)
 
 > **Nota:** Se você ainda não tem o PNPM instalado, pode instalá-lo globalmente com:
+>
 > ```bash
 > npm install -g pnpm@10.8.2
 > ```
@@ -21,17 +22,20 @@ Antes de começar, certifique-se de ter instalado:
 ## 🛠️ Instalação
 
 1. Clone o repositório:
+
 ```bash
 git clone https://github.com/leonardobits/mono-modular-crm
 cd mono-modular-crm
 ```
 
 2. Instale as dependências:
+
 ```bash
 pnpm install
 ```
 
 3. Compile os schemas Zod, que são essenciais para o projeto:
+
 ```bash
 pnpm --filter zod-schemas build
 ```
@@ -39,6 +43,7 @@ pnpm --filter zod-schemas build
 ## 🚀 Como Executar
 
 **Importante:** Antes de executar, copie o arquivo `.env.example` para `.env` e configure as variáveis necessárias:
+
 ```bash
 cp .env.example .env
 ```

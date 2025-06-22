@@ -40,19 +40,23 @@ export function TechStackSection() {
             </span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Utilizamos uma stack moderna e poderosa para garantir performance, escalabilidade e uma experiência de desenvolvimento de ponta.
+            Utilizamos uma stack moderna e poderosa para garantir performance,
+            escalabilidade e uma experiência de desenvolvimento de ponta.
           </p>
         </div>
-        <div
-          className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]"
-        >
+        <div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]">
           <div className="flex w-max animate-scroll">
             {[...technologies, ...technologies].map((tech, index) => (
-              <div key={index} className="mx-8 flex flex-col items-center justify-center gap-2 text-center">
+              <div
+                key={index}
+                className="mx-8 flex flex-col items-center justify-center gap-2 text-center"
+              >
                 <div className="text-muted-foreground transition-all duration-300 hover:text-primary hover:drop-shadow-[0_0_8px_var(--primary)]">
                   {tech.icon}
                 </div>
-                <span className="text-sm text-muted-foreground">{tech.name}</span>
+                <span className="text-sm text-muted-foreground">
+                  {tech.name}
+                </span>
               </div>
             ))}
           </div>
@@ -60,4 +64,4 @@ export function TechStackSection() {
       </div>
     </section>
   );
-} 
+}

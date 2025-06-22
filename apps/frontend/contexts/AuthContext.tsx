@@ -1,15 +1,23 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuthApi } from '@/hooks/useAuthApi';
-import { useRouter } from 'next/navigation';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useMemo,
+  useCallback,
+} from "react";
+import { useAuthApi } from "@/hooks/useAuthApi";
+import { useRouter } from "next/navigation";
 
 export interface User {
   id: string;
   email: string;
   full_name: string;
-  role: 'ADMIN' | 'MANAGER' | 'AGENT';
-  status: 'ACTIVE' | 'INACTIVE';
+  role: "ADMIN" | "MANAGER" | "AGENT";
+  status: "ACTIVE" | "INACTIVE";
 }
 
 interface AuthContextType {
@@ -31,34 +39,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  
-  const { 
-    login: apiLogin, 
-    logout: apiLogout, 
-    isAuthenticated: checkAuth, 
-    getCurrentUser 
+
+  const {
+    login: apiLogin,
+    logout: apiLogout,
+    isAuthenticated: checkAuth,
+    getCurrentUser,
   } = useAuthApi();
 
   useEffect(() => {
     const initializeAuth = () => {
       setIsLoading(true);
-      
-      if (typeof window !== 'undefined') {
-        if (checkAuth()) {
-          const userData = getCurrentUser();
-          if (userData) {
-            setUser(userData as User);
+
+      try {
+        if (typeof window !== "undefined") {
+          if (checkAuth()) {
+            const userData = getCurrentUser();
+            if (userData) {
+              setUser(userData as User);
+            }
           }
         }
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
 
     initializeAuth();
   }, []);
 
-  const login = async (credentials: { email: string; password: string }) => {
+  const login = useCallback(async (credentials: { email: string; password: string }) => {
     setIsLoading(true);
     try {
       const result = await apiLogin(credentials);
@@ -70,61 +82,60 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [apiLogin]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await apiLogout();
     } catch (error) {
-      console.error("Falha ao fazer logout no servidor, limpando o cliente de qualquer maneira.", error);
+      console.error(
+        "Falha ao fazer logout no servidor, limpando o cliente de qualquer maneira.",
+        error,
+      );
     }
     setUser(null);
-    router.push('/login');
-  };
+    router.push("/login");
+  }, [apiLogout, router]);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     if (checkAuth() && !user) {
       const userData = getCurrentUser();
       if (userData) {
         setUser(userData as User);
       }
     }
-  };
+  }, [checkAuth, getCurrentUser, user]);
 
-  const value: AuthContextType = {
+  const value: AuthContextType = useMemo(() => ({
     user,
     isAuthenticated: !!user && checkAuth(),
     isLoading,
     login,
     logout,
     refreshUser,
-  };
+  }), [user, isLoading, checkAuth, login, logout, refreshUser]);
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
   }
   return context;
 };
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: 'ADMIN' | 'MANAGER' | 'AGENT';
+  requiredRole?: "ADMIN" | "MANAGER" | "AGENT";
   fallback?: ReactNode;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
   requiredRole,
-  fallback = <div>Carregando...</div> 
+  fallback = <div>Carregando...</div>,
 }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
 
@@ -138,9 +149,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   if (requiredRole) {
     const roleHierarchy = {
-      'ADMIN': 3,
-      'MANAGER': 2, 
-      'AGENT': 1
+      ADMIN: 3,
+      MANAGER: 2,
+      AGENT: 1,
     };
 
     const userRoleLevel = roleHierarchy[user.role];
@@ -152,4 +163,4 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   return <>{children}</>;
-}; 
+};

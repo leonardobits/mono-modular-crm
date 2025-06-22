@@ -13,12 +13,12 @@ describe('AuthController (e2e)', () => {
     fullName: 'Admin Test',
     email: 'admin.test@example.com',
     role: 'ADMIN',
-    password: 'TestPassword123!'
+    password: 'TestPassword123!',
   };
 
   const testLogin = {
     email: 'admin.test@example.com',
-    password: 'TestPassword123!'
+    password: 'TestPassword123!',
   };
 
   beforeAll(async () => {
@@ -63,11 +63,13 @@ describe('AuthController (e2e)', () => {
         .post('/api/v1/auth/register')
         .send({
           ...testAdmin,
-          email: 'second.admin@example.com'
+          email: 'second.admin@example.com',
         })
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toContain('Initial admin registration is only allowed for the first user');
+          expect(res.body.message).toContain(
+            'Initial admin registration is only allowed for the first user',
+          );
         });
     });
 
@@ -78,7 +80,7 @@ describe('AuthController (e2e)', () => {
           fullName: '',
           email: 'invalid-email',
           role: 'ADMIN',
-          password: '123'
+          password: '123',
         })
         .expect(400);
     });
@@ -87,7 +89,7 @@ describe('AuthController (e2e)', () => {
       return request(app.getHttpServer())
         .post('/api/v1/auth/register')
         .send({
-          email: 'test@example.com'
+          email: 'test@example.com',
           // Faltando fullName, role, password
         })
         .expect(400);
@@ -117,7 +119,7 @@ describe('AuthController (e2e)', () => {
         .post('/api/v1/auth/login')
         .send({
           email: testLogin.email,
-          password: 'wrongpassword'
+          password: 'wrongpassword',
         })
         .expect(401);
     });
@@ -127,7 +129,7 @@ describe('AuthController (e2e)', () => {
         .post('/api/v1/auth/login')
         .send({
           email: 'nonexistent@example.com',
-          password: 'anypassword'
+          password: 'anypassword',
         })
         .expect(401);
     });
@@ -137,7 +139,7 @@ describe('AuthController (e2e)', () => {
         .post('/api/v1/auth/login')
         .send({
           email: 'invalid-email',
-          password: ''
+          password: '',
         })
         .expect(400);
     });
@@ -148,13 +150,15 @@ describe('AuthController (e2e)', () => {
       return request(app.getHttpServer())
         .post('/api/v1/auth/reset-password')
         .send({
-          email: testLogin.email
+          email: testLogin.email,
         })
         .expect(200)
         .expect((res) => {
           expect(res.body).toHaveProperty('success', true);
           expect(res.body).toHaveProperty('message');
-          expect(res.body.message).toContain('password reset email has been sent');
+          expect(res.body.message).toContain(
+            'password reset email has been sent',
+          );
         });
     });
 
@@ -162,12 +166,14 @@ describe('AuthController (e2e)', () => {
       return request(app.getHttpServer())
         .post('/api/v1/auth/reset-password')
         .send({
-          email: 'nonexistent@example.com'
+          email: 'nonexistent@example.com',
         })
         .expect(200)
         .expect((res) => {
           expect(res.body).toHaveProperty('success', true);
-          expect(res.body.message).toContain('password reset email has been sent');
+          expect(res.body.message).toContain(
+            'password reset email has been sent',
+          );
         });
     });
 
@@ -175,7 +181,7 @@ describe('AuthController (e2e)', () => {
       return request(app.getHttpServer())
         .post('/api/v1/auth/reset-password')
         .send({
-          email: 'invalid-email'
+          email: 'invalid-email',
         })
         .expect(400);
     });
@@ -196,7 +202,7 @@ describe('AuthController (e2e)', () => {
       const loginResponse = await request(app.getHttpServer())
         .post('/api/v1/auth/login')
         .send(testLogin);
-      
+
       authToken = loginResponse.body.session.access_token;
     });
 
@@ -209,9 +215,7 @@ describe('AuthController (e2e)', () => {
       });
 
       it('deve falhar sem token', () => {
-        return request(app.getHttpServer())
-          .get('/api/v1/auth/me')
-          .expect(401);
+        return request(app.getHttpServer()).get('/api/v1/auth/me').expect(401);
       });
 
       it('deve falhar com token inválido', () => {
@@ -255,4 +259,4 @@ describe('AuthController (e2e)', () => {
       });
     });
   });
-}); 
+});

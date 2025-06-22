@@ -7,7 +7,8 @@ export function Footer() {
     <footer className="w-full border-t border-border py-8">
       <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 text-center md:flex-row">
         <p className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} MonoModular CRM. Todos os direitos reservados.
+          © {new Date().getFullYear()} MonoModular CRM. Todos os direitos
+          reservados.
         </p>
         <div className="flex items-center gap-4">
           <a
@@ -38,4 +39,4 @@ export function Footer() {
       </div>
     </footer>
   );
-} 
+}

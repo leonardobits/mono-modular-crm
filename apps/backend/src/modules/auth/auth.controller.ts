@@ -1,5 +1,20 @@
-import { Controller, Post, Body, ValidationPipe, HttpStatus, UseGuards, Get, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Body,
+  ValidationPipe,
+  HttpStatus,
+  UseGuards,
+  Get,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { InitialAdminRegisterDto } from './dto/initial-admin-register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -15,12 +30,21 @@ export class AuthController {
   @Post('register')
   @ApiOperation({
     summary: 'Registrar administrador inicial',
-    description: 'Cria a conta do primeiro administrador do sistema com perfil completo.',
+    description:
+      'Cria a conta do primeiro administrador do sistema com perfil completo.',
   })
   @ApiBody({ type: InitialAdminRegisterDto })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Administrador registrado com sucesso.' })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Dados inválidos ou usuário já existe.' })
-  async register(@Body(new ValidationPipe()) registerDto: InitialAdminRegisterDto) {
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Administrador registrado com sucesso.',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Dados inválidos ou usuário já existe.',
+  })
+  async register(
+    @Body(new ValidationPipe()) registerDto: InitialAdminRegisterDto,
+  ) {
     return this.authService.registerInitialAdmin(registerDto);
   }
 
@@ -30,8 +54,14 @@ export class AuthController {
     description: 'Autentica um usuário e retorna um token de acesso JWT.',
   })
   @ApiBody({ type: LoginDto })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Login bem-sucedido, retorna token JWT.' })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Credenciais inválidas.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Login bem-sucedido, retorna token JWT.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Credenciais inválidas.',
+  })
   async login(@Body(new ValidationPipe()) loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
@@ -39,12 +69,21 @@ export class AuthController {
   @Post('reset-password')
   @ApiOperation({
     summary: 'Iniciar reset de senha',
-    description: 'Inicia o processo de redefinição de senha enviando um e-mail ao usuário.',
+    description:
+      'Inicia o processo de redefinição de senha enviando um e-mail ao usuário.',
   })
   @ApiBody({ type: ResetPasswordDto })
-  @ApiResponse({ status: HttpStatus.OK, description: 'E-mail de reset enviado com sucesso.' })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'E-mail não encontrado.' })
-  async resetPassword(@Body(new ValidationPipe()) resetPasswordDto: ResetPasswordDto) {
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'E-mail de reset enviado com sucesso.',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'E-mail não encontrado.',
+  })
+  async resetPassword(
+    @Body(new ValidationPipe()) resetPasswordDto: ResetPasswordDto,
+  ) {
     return this.authService.resetPassword(resetPasswordDto);
   }
 
@@ -56,7 +95,10 @@ export class AuthController {
     description: 'Invalida o token de acesso do usuário.',
   })
   @ApiResponse({ status: HttpStatus.OK, description: 'Logout bem-sucedido.' })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Token inválido.' })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Token inválido.',
+  })
   async logout() {
     return this.authService.logout();
   }
@@ -68,8 +110,14 @@ export class AuthController {
     summary: 'Obter perfil do usuário atual',
     description: 'Retorna as informações do usuário autenticado.',
   })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Perfil do usuário retornado com sucesso.' })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Token inválido.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Perfil do usuário retornado com sucesso.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Token inválido.',
+  })
   getProfile(@Req() req: { user: User }) {
     return this.authService.getProfile(req.user);
   }
@@ -81,9 +129,15 @@ export class AuthController {
     summary: 'Obter informações da sessão atual',
     description: 'Retorna as informações da sessão do usuário autenticado.',
   })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Sessão do usuário retornada com sucesso.' })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Token inválido.' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Sessão do usuário retornada com sucesso.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Token inválido.',
+  })
   getSession(@Req() req: { user: User }) {
     return this.authService.getSession(req.user);
   }
-} 
+}

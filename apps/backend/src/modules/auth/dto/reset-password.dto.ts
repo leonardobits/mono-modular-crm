@@ -9,4 +9,4 @@ export class ResetPasswordDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
-} 
+}
