@@ -87,9 +87,12 @@ describe("User Schemas", () => {
   describe("createUserSchema", () => {
     test("should validate correct user creation data", () => {
       const validData = {
-        fullName: "Maria Santos",
+        name: "Maria Santos",
         email: "maria@example.com",
         role: "MANAGER" as const,
+        password: "MinhaSenh@123",
+        confirmPassword: "MinhaSenh@123",
+        sendWelcomeEmail: true,
       };
 
       expect(() => createUserSchema.parse(validData)).not.toThrow();
@@ -103,9 +106,12 @@ describe("User Schemas", () => {
 
       roles.forEach((role) => {
         const data = {
-          fullName: "Teste User",
+          name: "Teste User",
           email: "teste@example.com",
           role,
+          password: "MinhaSenh@123",
+          confirmPassword: "MinhaSenh@123",
+          sendWelcomeEmail: false,
         };
 
         expect(() => createUserSchema.parse(data)).not.toThrow();
@@ -232,21 +238,17 @@ describe("User Schemas", () => {
   });
 
   describe("Schema Integration Tests", () => {
-    test("initialAdminRegisterSchema and createUserSchema should have same structure", () => {
+    test("initialAdminRegisterSchema should validate basic admin data", () => {
       const testData = {
         fullName: "Test User",
         email: "test@example.com",
         role: "ADMIN" as const,
       };
 
-      // Both schemas should accept the same data
       expect(() => initialAdminRegisterSchema.parse(testData)).not.toThrow();
-      expect(() => createUserSchema.parse(testData)).not.toThrow();
-
-      const initialResult = initialAdminRegisterSchema.parse(testData);
-      const createResult = createUserSchema.parse(testData);
-
-      expect(initialResult).toEqual(createResult);
+      
+      const result = initialAdminRegisterSchema.parse(testData);
+      expect(result).toEqual(testData);
     });
 
     test("updateUserSchema should accept all fields from createUserSchema", () => {

@@ -29,6 +29,7 @@ export function NavMain({
     items?: {
       title: string;
       url: string;
+      id?: string;
     }[];
   }[];
 }) {
@@ -53,8 +54,8 @@ export function NavMain({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
+                  {item.items?.map((subItem, index) => (
+                    <SidebarMenuSubItem key={subItem.id || subItem.title || index}>
                       <SidebarMenuSubButton asChild>
                         <a href={subItem.url}>
                           <span>{subItem.title}</span>

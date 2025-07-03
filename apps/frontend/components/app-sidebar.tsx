@@ -24,6 +24,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useInboxesApi } from "@/app/(admin)/inboxes/hooks/useInboxesApi";
 
 // Estes são dados de exemplo.
 const data = {
@@ -86,7 +87,7 @@ const data = {
         },
         {
           title: "Caixas de Entrada",
-          url: "#",
+          url: "/inboxes",
         },
         {
           title: "Respostas Prontas",
@@ -98,13 +99,39 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { inboxes, isLoading } = useInboxesApi();
+
+  // Criar itens do menu dinamicamente com base nos inboxes do usuário
+  const navMainWithInboxes = React.useMemo(() => {
+    const conversasItem = data.navMain.find(item => item.title === "Conversas");
+    if (!conversasItem) return data.navMain;
+
+    // Criar subitens para cada inbox
+    const inboxItems = inboxes
+      .filter(inbox => inbox.is_active) // Apenas inboxes ativos
+      .map(inbox => ({
+        title: inbox.name,
+        url: `/inboxes/${inbox.id}/conversations`,
+        id: inbox.id, // Adicionar ID único para evitar duplicatas
+      }));
+
+    // Atualizar o item Conversas com os subitens dos inboxes
+    const updatedNavMain = data.navMain.map(item => 
+      item.title === "Conversas" 
+        ? { ...item, items: inboxItems }
+        : item
+    );
+
+    return updatedNavMain;
+  }, [inboxes]);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMainWithInboxes} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

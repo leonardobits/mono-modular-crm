@@ -14,7 +14,8 @@ export function middleware(request: NextRequest) {
   }
 
   // Proteger rotas que precisam de autenticação
-  if (pathname === "/users" || pathname.startsWith("/users/")) {
+  if (pathname === "/users" || pathname.startsWith("/users/") || 
+      pathname === "/inboxes" || pathname.startsWith("/inboxes/")) {
     if (!authToken) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
@@ -24,5 +25,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/users/:path*", "/login", "/register", "/reset"],
+  matcher: ["/users/:path*", "/inboxes/:path*", "/login", "/register", "/reset"],
 };
