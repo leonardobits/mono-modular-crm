@@ -83,8 +83,7 @@ export class ConversationsService {
         .from('conversations')
         .select(`
           *,
-          contact:contacts(*),
-          assigned_agent:profiles(id, full_name, email)
+          contact:contacts(*)
         `)
         .eq('inbox_id', inboxId)
         .order('last_message_at', { ascending: false })
@@ -140,8 +139,7 @@ export class ConversationsService {
         .from('conversations')
         .select(`
           *,
-          contact:contacts(*),
-          assigned_agent:profiles(id, full_name, email)
+          contact:contacts(*)
         `)
         .eq('id', conversationId)
         .single();
@@ -186,8 +184,7 @@ export class ConversationsService {
       let query = supabase
         .from('messages')
         .select(`
-          *,
-          sender:profiles(id, full_name, email)
+          *
         `)
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true })
@@ -236,8 +233,7 @@ export class ConversationsService {
         .eq('id', conversationId)
         .select(`
           *,
-          contact:contacts(*),
-          assigned_agent:profiles(id, full_name, email)
+          contact:contacts(*)
         `)
         .single();
 
@@ -286,8 +282,7 @@ export class ConversationsService {
         .eq('id', conversationId)
         .select(`
           *,
-          contact:contacts(*),
-          assigned_agent:profiles(id, full_name, email)
+          contact:contacts(*)
         `)
         .single();
 
@@ -345,8 +340,7 @@ export class ConversationsService {
           is_private: isPrivate,
         })
         .select(`
-          *,
-          sender:profiles(id, full_name, email)
+          *
         `)
         .single();
 

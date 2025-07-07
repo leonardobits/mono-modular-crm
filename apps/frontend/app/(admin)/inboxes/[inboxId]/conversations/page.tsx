@@ -59,7 +59,7 @@ const InboxConversationsPage = () => {
   return (
     <AuthGuard requireAuth={true}>
       <AdminPageHeader
-        title={`Conversas - ${inboxName}`}
+        title=""
         breadcrumbs={breadcrumbs}
       />
       
