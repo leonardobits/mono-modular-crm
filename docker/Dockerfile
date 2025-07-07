@@ -1,80 +1,101 @@
-# 1. Estágio Base: Instala pnpm e turbo
-FROM node:20-slim AS base
+# Multi-stage Dockerfile for Render deployment
+# Supports both Next.js frontend and NestJS backend
+# Use build argument APP to specify which service to build: frontend or backend
+
+FROM node:20-alpine AS base
+RUN apk add --no-cache libc6-compat
+RUN corepack enable
+
+# Install turbo globally
+RUN npm install -g turbo
+
 WORKDIR /app
-RUN npm install -g pnpm turbo
 
-# 2. Estágio de Dependências: Instala as dependências do monorepo
-FROM base AS deps
-WORKDIR /app
+# Copy root package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 
-# Copia os arquivos de manifesto de dependências
-COPY package.json pnpm-lock.yaml .npmrc ./
-COPY pnpm-workspace.yaml ./
-COPY turbo.json ./
-
-# Copia os package.json de cada app e package para otimizar o cache
+# Copy package.json files for all apps and packages
 COPY apps/backend/package.json ./apps/backend/
 COPY apps/frontend/package.json ./apps/frontend/
-# Adicione aqui outros packages se eles tiverem seus próprios package.json
-# COPY packages/some-package/package.json ./packages/some-package/
+COPY packages/*/package.json ./packages/*/
 
-# Instala todas as dependências usando pnpm
+# Install all dependencies
 RUN pnpm install --frozen-lockfile
 
-# 3. Estágio de Build: Constrói as aplicações com Turborepo
-FROM base AS builder
-WORKDIR /app
-
-# Copia as dependências já instaladas do estágio 'deps'
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/pnpm-lock.yaml ./
-COPY --from=deps /app/.npmrc ./
-COPY --from=deps /app/pnpm-workspace.yaml ./
-COPY --from=deps /app/turbo.json ./
-COPY --from=deps /app/package.json ./
-
-# Copia todo o código fonte
+# Copy source code
 COPY . .
 
-# Executa o build de todas as aplicações e pacotes
-# O Turborepo irá paralelizar e cachear o processo
-RUN turbo run build --filter=backend --filter=frontend
+# Build argument to specify which app to build
+ARG APP
+ENV APP=${APP}
 
-# 4. Estágio Final do Backend: Cria a imagem de produção do NestJS
-FROM node:20-slim AS backend
+# Build the specified app
+RUN turbo run build --filter=${APP}
+
+# Production stage for backend
+FROM node:20-alpine AS backend-prod
+RUN apk add --no-cache libc6-compat
+RUN corepack enable
+
 WORKDIR /app
 
-# Define o ambiente para produção
+# Copy package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/backend/package.json ./apps/backend/
+
+# Install only production dependencies
+RUN pnpm install --prod --frozen-lockfile
+
+# Copy built backend
+COPY --from=base /app/apps/backend/dist ./apps/backend/dist
+
+# Set environment
 ENV NODE_ENV=production
-
-# Copia as dependências de produção do estágio de build
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/backend/package.json ./apps/backend/package.json
-COPY --from=builder /app/package.json ./
-
-# Copia os artefatos de build do backend
-COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
+ENV PORT=3001
 
 EXPOSE 3001
-CMD ["pnpm", "--filter", "backend", "start:prod"]
 
-# 5. Estágio Final do Frontend: Cria a imagem de produção do Next.js
-FROM node:20-slim AS frontend
+# Use node directly for better performance
+CMD ["node", "apps/backend/dist/main"]
+
+# Production stage for frontend
+FROM node:20-alpine AS frontend-prod
+RUN apk add --no-cache libc6-compat
+RUN corepack enable
+
 WORKDIR /app
 
-# Define o ambiente para produção
+# Copy package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/frontend/package.json ./apps/frontend/
+
+# Install only production dependencies
+RUN pnpm install --prod --frozen-lockfile
+
+# Copy built frontend
+COPY --from=base /app/apps/frontend/.next ./apps/frontend/.next
+COPY --from=base /app/apps/frontend/public ./apps/frontend/public
+COPY --from=base /app/apps/frontend/package.json ./apps/frontend/
+
+# Set environment
 ENV NODE_ENV=production
-
-# Copia o package.json do app frontend
-COPY --from=builder /app/apps/frontend/package.json ./apps/frontend/package.json
-COPY --from=builder /app/package.json ./
-
-# Copia as dependências de produção
-COPY --from=builder /app/node_modules ./node_modules
-
-# Copia os artefatos de build do frontend
-COPY --from=builder /app/apps/frontend/.next ./apps/frontend/.next
-COPY --from=builder /app/apps/frontend/public ./apps/frontend/public
+ENV PORT=3000
 
 EXPOSE 3000
-CMD ["pnpm", "--filter", "frontend", "start"] 
+
+CMD ["pnpm", "--filter", "frontend", "start"]
+
+# Final stage - dynamically choose based on APP argument
+FROM backend-prod AS final-backend
+FROM frontend-prod AS final-frontend
+
+# Default to backend if no APP specified
+FROM final-${APP:-backend} AS final
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD if [ "${APP}" = "frontend" ]; then \
+        curl -f http://localhost:3000/api/health || exit 1; \
+      else \
+        curl -f http://localhost:3001/health || exit 1; \
+      fi
