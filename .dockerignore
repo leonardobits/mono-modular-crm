@@ -1,5 +1,6 @@
 # Arquivos e diretórios para ignorar no build do Docker
-# Dependências de desenvolvimento
+
+# Dependências (serão reinstaladas)
 node_modules/
 .turbo/
 .pnpm-debug.log*
@@ -7,13 +8,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Arquivos de build
+# Arquivos de build (serão reconstruídos)
 dist/
 build/
 *.tsbuildinfo
 .next/
 
-# Arquivos de ambiente (serão definidos no deployment)
+# Arquivos de ambiente
 .env
 .env.local
 .env.*.local
@@ -33,10 +34,16 @@ Thumbs.db
 logs/
 *.log
 dev-debug.log
+backend-debug.log
+backend-new.log
 
 # Arquivos de teste
 coverage/
 .nyc_output/
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
 
 # Arquivos temporários
 tmp/
@@ -50,7 +57,6 @@ temp/
 
 # Git
 .git/
-.gitignore
 
 # Documentação
 docs/
@@ -67,39 +73,22 @@ scripts/
 
 # Arquivos de Docker
 docker/
-Dockerfile
 docker-compose.yml
-.dockerignore
 
-# Arquivos de teste
-*.test.ts
-*.test.js
-*.spec.ts
-*.spec.js
-test/
-e2e/
-
-# Arquivos de media
+# Arquivos de upload
 uploads/
 media/
 public/uploads/
 
-# Mantém apenas os arquivos necessários para o build:
-# - package.json files
+# Arquivos desnecessários para produção
+.gitignore
+.npmrc
+.prettierrc
+
+# IMPORTANTE: NÃO ignorar arquivos essenciais:
+# - package.json (raiz e apps)
 # - pnpm-lock.yaml
 # - pnpm-workspace.yaml
 # - turbo.json
-# - source code (src/)
-# - public/ (para frontend)
-# - prisma/ (se houver)
-
-# Força inclusão dos arquivos necessários
-!package.json
-!pnpm-lock.yaml
-!pnpm-workspace.yaml
-!turbo.json
-!apps/*/package.json
-!packages/*/package.json
-!apps/*/src/
-!apps/*/public/
-!apps/*/prisma/ 
+# - código fonte (src/)
+# - arquivos de configuração do build 
