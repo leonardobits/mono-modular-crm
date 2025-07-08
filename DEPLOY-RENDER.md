@@ -7,7 +7,8 @@ O erro `"not found"` nos arquivos `package.json` e `pnpm-workspace.yaml` foi cor
 1. ✅ **Dockerfile otimizado** movido para a raiz do projeto
 2. ✅ **`.dockerignore` simplificado** para incluir arquivos essenciais
 3. ✅ **Contexto do build corrigido** para encontrar todos os arquivos necessários
-4. ✅ **Push realizado** - commit `e088747` disponível no repositório
+4. ✅ **devDependencies incluídas** durante o build para compilar TypeScript
+5. ✅ **Push realizado** - commit `a901f45` disponível no repositório
 
 ## 🛠️ Configuração no Render
 
@@ -17,9 +18,10 @@ O erro `"not found"` nos arquivos `package.json` e `pnpm-workspace.yaml` foi cor
    - **Name**: `mono-crm-backend`
    - **Runtime**: `Docker`
    - **Branch**: `main`
-   - **Build Command**: *(deixar vazio)*
+   - **Build Command**: (deixar vazio)
    - **Dockerfile Path**: `./Dockerfile`
    - **Docker Context**: `./` (raiz do projeto)
+   - **Docker Build Target**: `backend-prod`
 
 2. **Build Arguments**:
    ```
@@ -48,9 +50,10 @@ O erro `"not found"` nos arquivos `package.json` e `pnpm-workspace.yaml` foi cor
    - **Name**: `mono-crm-frontend`
    - **Runtime**: `Docker`
    - **Branch**: `main`
-   - **Build Command**: *(deixar vazio)*
+   - **Build Command**: (deixar vazio)
    - **Dockerfile Path**: `./Dockerfile`
    - **Docker Context**: `./` (raiz do projeto)
+   - **Docker Build Target**: `frontend-prod`
 
 2. **Build Arguments**:
    ```
@@ -76,11 +79,11 @@ Para testar o build localmente:
 
 ```bash
 # Backend
-docker build --build-arg APP=backend -t mono-crm-backend .
+docker build --build-arg APP=backend --target=backend-prod -t mono-crm-backend .
 docker run -p 3001:3001 mono-crm-backend
 
 # Frontend
-docker build --build-arg APP=frontend -t mono-crm-frontend .
+docker build --build-arg APP=frontend --target=frontend-prod -t mono-crm-frontend .
 docker run -p 3000:3000 mono-crm-frontend
 ```
 
@@ -89,16 +92,16 @@ docker run -p 3000:3000 mono-crm-frontend
 ```dockerfile
 # Multi-stage build otimizado
 FROM node:20-alpine AS base
-# ... instalar dependências e buildar
+# ... instalar dependências (incluindo dev) e buildar
 
 FROM node:20-alpine AS backend-prod
-# ... preparar produção backend
+# ... preparar produção backend (apenas prod dependencies)
 
 FROM node:20-alpine AS frontend-prod
-# ... preparar produção frontend
+# ... preparar produção frontend (apenas prod dependencies)
 
-FROM final-${APP} AS final
-# ... escolher app baseado no build arg
+FROM backend-prod AS final
+# ... usar backend como padrão
 ```
 
 ## 🔍 Verificação
@@ -117,6 +120,7 @@ Após o deploy:
 3. **Verificar environment variables** estão definidas
 4. **Dockerfile Path** deve ser `./Dockerfile`
 5. **Docker Context** deve ser `./`
+6. **Docker Build Target** deve ser `backend-prod` ou `frontend-prod`
 
 ### Se o health check falhar:
 
@@ -136,9 +140,10 @@ Se falhar, o Render reinicia automaticamente o serviço.
 
 1. **Criar os dois serviços** no Render
 2. **Configurar as variáveis de ambiente** 
-3. **Aguardar o build** (pode demorar alguns minutos)
-4. **Verificar os health checks**
-5. **Testar as aplicações**
+3. **Configurar os build targets** (`backend-prod` e `frontend-prod`)
+4. **Aguardar o build** (pode demorar alguns minutos)
+5. **Verificar os health checks**
+6. **Testar as aplicações**
 
 ## 🎯 Resultado Esperado
 
@@ -146,6 +151,18 @@ Se falhar, o Render reinicia automaticamente o serviço.
 - **Frontend**: App funcionando em `https://mono-crm-frontend.onrender.com`
 - **Health checks**: Ambos verdes no dashboard
 - **Logs**: Sem erros de runtime
+
+## 📋 Configuração Render (Resumo)
+
+| Configuração | Backend | Frontend |
+|-------------|---------|----------|
+| **Runtime** | Docker | Docker |
+| **Dockerfile Path** | `./Dockerfile` | `./Dockerfile` |
+| **Docker Context** | `./` | `./` |
+| **Docker Build Target** | `backend-prod` | `frontend-prod` |
+| **Build Args** | `APP=backend` | `APP=frontend` |
+| **Health Check** | `/health` | `/` |
+| **Port** | 3001 | 3000 |
 
 ---
 
