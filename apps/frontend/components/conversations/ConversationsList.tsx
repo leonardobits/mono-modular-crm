@@ -175,16 +175,16 @@ export default function ConversationsList({
       <CardContent className="p-0">
         <ScrollArea className="h-[calc(100vh-20rem)]">
           {loading ? (
-            <div className="p-4 text-center text-gray-500">
+            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
               Carregando conversas...
             </div>
           ) : error ? (
-            <div className="p-4 text-center text-red-500">
+            <div className="p-4 text-center text-red-500 dark:text-red-400">
               Erro: {error}
             </div>
           ) : filteredConversations.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              <MessageCircle className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+              <MessageCircle className="w-12 h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
               <p>Nenhuma conversa encontrada</p>
               <p className="text-sm">
                 {searchTerm ? 'Tente ajustar os filtros de busca' : 'As conversas aparecerão aqui quando chegarem mensagens'}
@@ -196,8 +196,8 @@ export default function ConversationsList({
                 <button
                   key={conversation.id}
                   onClick={() => onConversationSelect(conversation)}
-                  className={`w-full p-3 text-left border-b hover:bg-gray-50 transition-colors ${
-                    selectedConversationId === conversation.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                  className={`w-full p-3 text-left border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
+                    selectedConversationId === conversation.id ? 'bg-blue-50 dark:bg-blue-950/50 border-l-4 border-l-blue-500 dark:border-l-blue-400' : ''
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -215,7 +215,7 @@ export default function ConversationsList({
                       </div>
                       
                       {conversation.last_message && (
-                        <p className="text-xs text-gray-600 truncate">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                           {conversation.last_message.sender_type === 'contact' ? '' : 'Você: '}
                           {conversation.last_message.content}
                         </p>
@@ -231,19 +231,19 @@ export default function ConversationsList({
                           </Badge>
                           
                           {conversation.assigned_agent ? (
-                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                               <UserCheck className="w-3 h-3" />
                               {conversation.assigned_agent.full_name.split(' ')[0]}
                             </div>
                           ) : (
-                            <div className="flex items-center gap-1 text-xs text-gray-400">
+                            <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
                               <Users className="w-3 h-3" />
                               Não atribuída
                             </div>
                           )}
                         </div>
                         
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
                           {formatDistanceToNow(new Date(conversation.last_message_at), {
                             addSuffix: true,
                             locale: ptBR,
