@@ -25,7 +25,7 @@ COPY apps/backend/package.json ./apps/backend/
 COPY apps/frontend/package.json ./apps/frontend/
 COPY packages/zod-schemas/package.json ./packages/zod-schemas/
 
-# Instalar todas as dependências
+# Instalar TODAS as dependências (incluindo dev) para o build
 RUN pnpm install --frozen-lockfile
 
 # Copiar todo o código fonte
@@ -110,12 +110,11 @@ EXPOSE 3000
 
 CMD ["pnpm", "--filter", "frontend", "start"]
 
-# Estágio final - escolher dinamicamente baseado no argumento APP
-FROM backend-prod AS final-backend
-FROM frontend-prod AS final-frontend
+# Estágio final usando argumentos condicionais simples
+ARG APP=backend
 
-# Usar backend como padrão se APP não for especificado
-FROM final-${APP} AS final
+# Usar backend como padrão
+FROM backend-prod AS final
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
