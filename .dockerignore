@@ -1,0 +1,59 @@
+# .dockerignore - Minimalista para evitar problemas de contexto
+
+# Dependências (serão reinstaladas)
+node_modules/
+.turbo/
+
+# Arquivos de build gerados
+dist/
+build/
+.next/
+
+# Arquivos de ambiente
+.env*
+
+# Logs
+*.log
+logs/
+
+# Cache
+.cache/
+.npm/
+
+# Git
+.git/
+
+# Documentação
+docs/
+README.md
+
+# Arquivos de configuração do projeto
+.taskmaster/
+.cursor/
+.roo/
+.roomodes
+.windsurfrules
+.claude/
+
+# Docker
+docker/
+
+# Arquivos de upload
+uploads/
+media/
+
+# Arquivos temporários
+tmp/
+temp/
+
+# Arquivos de teste
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+coverage/
+
+# IDE
+.idea/
+.vscode/
+.DS_Store 
