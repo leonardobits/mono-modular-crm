@@ -11,6 +11,18 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, MessageCircle, Clock, CheckCircle, UserCheck, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'; 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronDown } from 'lucide-react';
+import { strict } from 'node:assert';
+
 
 interface ConversationsListProps {
   inboxId: string;
@@ -193,66 +205,86 @@ export default function ConversationsList({
           ) : (
             <div className="space-y-1">
               {filteredConversations.map((conversation) => (
-                <button
-                  key={conversation.id}
-                  onClick={() => onConversationSelect(conversation)}
-                  className={`w-full p-3 text-left border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
-                    selectedConversationId === conversation.id ? 'bg-blue-50 dark:bg-blue-950/50 border-l-4 border-l-blue-500 dark:border-l-blue-400' : ''
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        {getStatusIcon(conversation.status)}
-                        <span className="font-medium text-sm truncate">
-                          {conversation.contact.name || conversation.contact.phone || 'Cliente'}
-                        </span>
-                        {conversation.unread_count && conversation.unread_count > 0 && (
-                          <Badge variant="destructive" className="text-xs px-1 py-0 min-w-0">
-                            {conversation.unread_count}
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      {conversation.last_message && (
-                        <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                          {conversation.last_message.sender_type === 'contact' ? '' : 'Você: '}
-                          {conversation.last_message.content}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className={`text-xs ${getStatusColor(conversation.status)}`}>
-                            {conversation.status === 'open' && 'Aberta'}
-                            {conversation.status === 'pending' && 'Pendente'}
-                            {conversation.status === 'resolved' && 'Resolvida'}
-                            {conversation.status === 'snoozed' && 'Adiada'}
-                          </Badge>
-                          
-                          {conversation.assigned_agent ? (
-                            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                              <UserCheck className="w-3 h-3" />
-                              {conversation.assigned_agent.full_name.split(' ')[0]}
+                <div key={conversation.id}>
+
+                      <button
+                        onClick={() => onConversationSelect(conversation)}
+                        className={`w-full p-3 text-left border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
+                          selectedConversationId === conversation.id ? 'bg-blue-50 dark:bg-blue-950/50 border-l-4 border-l-blue-500 dark:border-l-blue-400' : ''
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Avatar>
+                                <AvatarImage src="https://avatars.githubusercontent.com/u/153465524?v=4" />
+                                <AvatarFallback>AA</AvatarFallback>
+                              </Avatar>
+
+                              <span className="font-medium text-sm truncate">
+                                {conversation.contact.name || conversation.contact.phone || 'Cliente'}
+                              </span>
+                              {conversation.unread_count && conversation.unread_count > 0 && (
+                                <Badge variant="destructive" className="text-xs px-1 py-0 min-w-0">
+                                  {conversation.unread_count}
+                                </Badge>
+                              )}
                             </div>
-                          ) : (
-                            <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
-                              <Users className="w-3 h-3" />
-                              Não atribuída
+                            
+                            <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                    <button style={{ float: 'right' }}>
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>Atribuir</DropdownMenuItem>
+                      <DropdownMenuItem>Marcar como resolvida</DropdownMenuItem>
+                      <DropdownMenuItem>Adiar</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                            {conversation.last_message && (
+                              <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                                {conversation.last_message.sender_type === 'contact' ? '' : 'Você: '}
+                                {conversation.last_message.content}
+                              </p>
+                            )}        
+                            <div className="flex items-center justify-between mt-2">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className={`text-xs ${getStatusColor(conversation.status)}`}>
+                                  {conversation.status === 'open' && 'Aberta'}
+                                  {conversation.status === 'pending' && 'Pendente'}
+                                  {conversation.status === 'resolved' && 'Resolvida'}
+                                  {conversation.status === 'snoozed' && 'Adiada'}
+                                </Badge>
+                                
+                                {conversation.assigned_agent ? (
+                                  <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                                    <UserCheck className="w-3 h-3" />
+                                    {conversation.assigned_agent.full_name.split(' ')[0]}
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+                                    <Users className="w-3 h-3" />
+                                    Não atribuída
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <span className="text-xs text-gray-400 dark:text-gray-500">
+                                {formatDistanceToNow(new Date(conversation.last_message_at), {
+                                  addSuffix: true,
+                                  locale: ptBR,
+                                })}
+                              </span>
                             </div>
-                          )}
+                          </div>
                         </div>
-                        
-                        <span className="text-xs text-gray-400 dark:text-gray-500">
-                          {formatDistanceToNow(new Date(conversation.last_message_at), {
-                            addSuffix: true,
-                            locale: ptBR,
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </button>
+                      </button>
+
+                </div>
               ))}
             </div>
           )}
