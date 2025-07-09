@@ -2,294 +2,163 @@
 
 import { useState, useEffect } from 'react';
 import { useConversationsApi, type Conversation } from '@/hooks/useConversationsApi';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, MessageCircle, Clock, CheckCircle, UserCheck, Users } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Search, MessageSquareText, Check, CheckCheck, ChevronDown, Users, UserCheck } from 'lucide-react';
+import { format, isToday, isYesterday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'; 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { ChevronDown } from 'lucide-react';
-import { strict } from 'node:assert';
 
+const formatTimestamp = (date: Date) => {
+if (isToday(date)) {
+return format(date, 'HH:mm');
+}
+if (isYesterday(date)) {
+return 'Ontem';
+}
+return format(date, 'dd/MM/yyyy');
+};
 
 interface ConversationsListProps {
-  inboxId: string;
-  selectedConversationId?: string;
-  onConversationSelect: (conversation: Conversation) => void;
+inboxId: string;
+selectedConversationId?: string;
+onConversationSelect: (conversation: Conversation) => void;
 }
 
 export default function ConversationsList({
-  inboxId,
-  selectedConversationId,
-  onConversationSelect,
+inboxId,
+selectedConversationId,
+onConversationSelect,
 }: ConversationsListProps) {
-  const { getConversations, getConversationStats, loading, error } = useConversationsApi();
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [stats, setStats] = useState({
-    total: 0,
-    open: 0,
-    resolved: 0,
-    pending: 0,
-    snoozed: 0,
-    unassigned: 0,
-  });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [assignmentFilter, setAssignmentFilter] = useState<string>('all');
+const { getConversations, loading, error } = useConversationsApi();
+const [conversations, setConversations] = useState<Conversation[]>([]);
+const [searchTerm, setSearchTerm] = useState('');
 
-  const loadConversations = async () => {
-    try {
-      const filters: any = {};
-      if (statusFilter !== 'all') {
-        filters.status = statusFilter;
-      }
-      if (assignmentFilter === 'unassigned') {
-        filters.assigned_agent_id = 'unassigned';
-      } else if (assignmentFilter === 'mine') {
-        // TODO: Add current user ID when available
-      }
+useEffect(() => {
+const loadConversations = async () => {
+try {
+const data = await getConversations(inboxId, {});
+setConversations(data);
+} catch (err) {
+console.error('Erro ao carregar conversas:', err);
+}
+};
+if (inboxId) {
+loadConversations();
+}
+}, [inboxId]);
 
-      const data = await getConversations(inboxId, filters);
-      setConversations(data);
-    } catch (err) {
-      console.error('Erro ao carregar conversas:', err);
-    }
-  };
+const getReadStatusIcon = (lastMessage: Conversation['last_message']) => {
+if (!lastMessage || lastMessage.sender_type === 'contact') {
+return null;
+}
+return <CheckCheck className="w-4 h-4 text-blue-500" />;
+};
 
-  const loadStats = async () => {
-    try {
-      const data = await getConversationStats(inboxId);
-      setStats(data);
-    } catch (err) {
-      console.error('Erro ao carregar estatísticas:', err);
-    }
-  };
+const filteredConversations = conversations.filter(conversation =>
+searchTerm === '' ||
+conversation.contact.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+conversation.last_message?.content?.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
-  useEffect(() => {
-    if (inboxId) {
-      loadConversations();
-      loadStats();
-    }
-  }, [inboxId, statusFilter, assignmentFilter]);
+return (
+<div className="flex flex-col h-full bg-white dark:bg-gray-900 border-r dark:border-gray-700">
+<header className="p-4 border-b dark:border-gray-700">
+<h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
+<MessageSquareText className="w-7 h-7" />
+Conversas
+</h1>
+<div className="relative">
+<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+<Input
+placeholder="Pesquisar ou começar uma nova conversa"
+value={searchTerm}
+onChange={(e) => setSearchTerm(e.target.value)}
+className="pl-9 rounded-full bg-gray-100 dark:bg-gray-800 focus-visible:ring-offset-0 focus-visible:ring-1"
+/>
+</div>
+</header>
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'open':
-        return <MessageCircle className="w-4 h-4 text-green-500" />;
-      case 'pending':
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-      case 'resolved':
-        return <CheckCircle className="w-4 h-4 text-blue-500" />;
-      case 'snoozed':
-        return <Clock className="w-4 h-4 text-gray-500" />;
-      default:
-        return <MessageCircle className="w-4 h-4" />;
-    }
-  };
+<ScrollArea className="flex-1">
+{loading && <div className="p-4 text-center text-gray-500">Carregando...</div>}
+{error && <div className="p-4 text-center text-red-500">Erro ao carregar conversas.</div>}
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'resolved':
-        return 'bg-blue-100 text-blue-800';
-      case 'snoozed':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+{!loading && !error && filteredConversations.length === 0 && (
+<div className="flex flex-col items-center justify-center h-full text-center text-gray-500 p-4">
+<MessageSquareText className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
+<p className="font-semibold">Nenhuma conversa encontrada</p>
+<p className="text-sm">
+{searchTerm 
+? 'Tente uma busca diferente.' 
+: 'As novas conversas aparecerão aqui.'
+}
+</p>
+</div>
+)}
 
-  const filteredConversations = conversations.filter(conversation =>
-    searchTerm === '' ||
-    conversation.contact.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    conversation.contact.phone?.includes(searchTerm) ||
-    conversation.last_message?.content?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+<div className="divide-y divide-gray-200 dark:divide-gray-700">
+{filteredConversations.map((conversation) => (
+<button
+key={conversation.id}
+onClick={() => onConversationSelect(conversation)}
+className={`w-full text-left transition-colors ${
+selectedConversationId === conversation.id 
+? 'bg-gray-100 dark:bg-gray-800' 
+: 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+}`}
+>
+<div className="p-3 flex items-start space-x-3">
+<Avatar className="w-12 h-12">
+<AvatarImage src={conversation.contact.avatar_url || 'https://avatars.githubusercontent.com/u/153465524?v=4'} />
+<AvatarFallback>{conversation.contact.name?.substring(0, 2).toUpperCase() || 'C'}</AvatarFallback>
+</Avatar>
 
-  return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <MessageCircle className="w-5 h-5" />
-          Conversas
-        </CardTitle>
-        
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-2 text-xs">
-          <div className="text-center">
-            <div className="font-semibold text-green-600">{stats.open}</div>
-            <div className="text-gray-500">Abertas</div>
-          </div>
-          <div className="text-center">
-            <div className="font-semibold text-yellow-600">{stats.pending}</div>
-            <div className="text-gray-500">Pendentes</div>
-          </div>
-          <div className="text-center">
-            <div className="font-semibold text-gray-600">{stats.unassigned}</div>
-            <div className="text-gray-500">Não atribuídas</div>
-          </div>
-        </div>
+<div className="flex-1 min-w-0">
+<div className="flex justify-between items-center">
+<p className="font-semibold truncate text-gray-900 dark:text-white">
+{conversation.contact.name || conversation.contact.phone || 'Contato Desconhecido'}
+</p>
+<span className={`text-xs ${conversation.unread_count > 0 ? 'text-green-500 dark:text-green-400 font-bold' : 'text-gray-500 dark:text-gray-400'}`}>
+{formatTimestamp(new Date(conversation.last_message_at))}
+</span>
+</div>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input
-            placeholder="Buscar conversas..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8"
-          />
-        </div>
+<div className="flex justify-between items-start mt-1">
+<div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 truncate pr-2">
+{getReadStatusIcon(conversation.last_message)}
+<p className="truncate">
+{conversation.last_message?.content || 'Nenhuma mensagem ainda.'}
+</p>
+</div>
 
-        {/* Filters */}
-        <div className="grid grid-cols-2 gap-2">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="open">Abertas</SelectItem>
-              <SelectItem value="pending">Pendentes</SelectItem>
-              <SelectItem value="resolved">Resolvidas</SelectItem>
-              <SelectItem value="snoozed">Adiadas</SelectItem>
-            </SelectContent>
-          </Select>
+<div className='flex flex-col items-end'>
+{conversation.unread_count > 0 && (
+<Badge className="bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:text-gray-900 text-white rounded-full w-6 h-6 flex items-center justify-center p-0">
+{conversation.unread_count}
+</Badge>
+)}
 
-          <Select value={assignmentFilter} onValueChange={setAssignmentFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Atribuição" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              <SelectItem value="mine">Minhas</SelectItem>
-              <SelectItem value="unassigned">Não atribuídas</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-0">
-        <ScrollArea className="h-[calc(100vh-20rem)]">
-          {loading ? (
-            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-              Carregando conversas...
-            </div>
-          ) : error ? (
-            <div className="p-4 text-center text-red-500 dark:text-red-400">
-              Erro: {error}
-            </div>
-          ) : filteredConversations.length === 0 ? (
-            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-              <MessageCircle className="w-12 h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-              <p>Nenhuma conversa encontrada</p>
-              <p className="text-sm">
-                {searchTerm ? 'Tente ajustar os filtros de busca' : 'As conversas aparecerão aqui quando chegarem mensagens'}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {filteredConversations.map((conversation) => (
-                <div key={conversation.id}>
-
-                      <button
-                        onClick={() => onConversationSelect(conversation)}
-                        className={`w-full p-3 text-left border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
-                          selectedConversationId === conversation.id ? 'bg-blue-50 dark:bg-blue-950/50 border-l-4 border-l-blue-500 dark:border-l-blue-400' : ''
-                        }`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Avatar>
-                                <AvatarImage src="https://avatars.githubusercontent.com/u/153465524?v=4" />
-                                <AvatarFallback>AA</AvatarFallback>
-                              </Avatar>
-
-                              <span className="font-medium text-sm truncate">
-                                {conversation.contact.name || conversation.contact.phone || 'Cliente'}
-                              </span>
-                              {conversation.unread_count && conversation.unread_count > 0 && (
-                                <Badge variant="destructive" className="text-xs px-1 py-0 min-w-0">
-                                  {conversation.unread_count}
-                                </Badge>
-                              )}
-                            </div>
-                            
-                            <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                    <button style={{ float: 'right' }}>
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>Atribuir</DropdownMenuItem>
-                      <DropdownMenuItem>Marcar como resolvida</DropdownMenuItem>
-                      <DropdownMenuItem>Adiar</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                            {conversation.last_message && (
-                              <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                                {conversation.last_message.sender_type === 'contact' ? '' : 'Você: '}
-                                {conversation.last_message.content}
-                              </p>
-                            )}        
-                            <div className="flex items-center justify-between mt-2">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="secondary" className={`text-xs ${getStatusColor(conversation.status)}`}>
-                                  {conversation.status === 'open' && 'Aberta'}
-                                  {conversation.status === 'pending' && 'Pendente'}
-                                  {conversation.status === 'resolved' && 'Resolvida'}
-                                  {conversation.status === 'snoozed' && 'Adiada'}
-                                </Badge>
-                                
-                                {conversation.assigned_agent ? (
-                                  <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                                    <UserCheck className="w-3 h-3" />
-                                    {conversation.assigned_agent.full_name.split(' ')[0]}
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
-                                    <Users className="w-3 h-3" />
-                                    Não atribuída
-                                  </div>
-                                )}
-                              </div>
-                              
-                              <span className="text-xs text-gray-400 dark:text-gray-500">
-                                {formatDistanceToNow(new Date(conversation.last_message_at), {
-                                  addSuffix: true,
-                                  locale: ptBR,
-                                })}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </button>
-
-                </div>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
-      </CardContent>
-    </Card>
-  );
+<DropdownMenu>
+<DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+<ChevronDown className="w-5 h-5 text-gray-400 hover:text-gray-700 dark:hover:text-white mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+</DropdownMenuTrigger>
+<DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+<DropdownMenuItem>Marcar como lida</DropdownMenuItem>
+<DropdownMenuItem>Arquivar conversa</DropdownMenuItem>
+<DropdownMenuItem>Silenciar</DropdownMenuItem>
+<DropdownMenuItem className="text-red-500">Excluir conversa</DropdownMenuItem>
+</DropdownMenuContent>
+</DropdownMenu>
+</div>
+</div>
+</div>
+</div>
+</button>
+))}
+</div>
+</ScrollArea>
+</div>
+);
 }
