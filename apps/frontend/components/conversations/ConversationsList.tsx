@@ -112,7 +112,7 @@ className="pl-9 rounded-full bg-gray-100 dark:bg-gray-800 focus-visible:ring-off
   >
     <div className="p-3 flex items-start space-x-3">
       <Avatar className="w-12 h-12">
-        <AvatarImage src={conversation.contact.avatar_url || 'https://avatars.githubusercontent.com/u/153465524?v=4'} />
+        <AvatarImage src={(conversation.contact as any).avatar_url || 'https://avatars.githubusercontent.com/u/153465524?v=4'} />
         <AvatarFallback>{conversation.contact.name?.substring(0, 2).toUpperCase() || 'C'}</AvatarFallback>
       </Avatar>
 
@@ -123,7 +123,7 @@ className="pl-9 rounded-full bg-gray-100 dark:bg-gray-800 focus-visible:ring-off
           </p>
           <span className={`text-xs ${
 
-            conversation.unread_count && conversation.unread_count > 0 
+            (conversation.unread_count ?? 0) > 0 
               ? 'text-green-500 dark:text-green-400 font-bold' 
               : 'text-gray-500 dark:text-gray-400'
           }`}>
@@ -141,7 +141,7 @@ className="pl-9 rounded-full bg-gray-100 dark:bg-gray-800 focus-visible:ring-off
           
           <div className='flex flex-col items-end min-h-[28px]'> 
            
-            {conversation.unread_count > 0 && (
+            {(conversation.unread_count ?? 0) > 0 && (
               <Badge className="bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:text-gray-900 text-white rounded-full w-6 h-6 flex items-center justify-center p-0 mb-1">
                 {conversation.unread_count}
               </Badge>
